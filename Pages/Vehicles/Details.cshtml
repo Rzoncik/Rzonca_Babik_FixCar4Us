@@ -1,0 +1,122 @@
+@page
+@model Rzonca_Babik_FixCar4Us.Pages.Vehicles.DetailsModel
+@{
+    ViewData["Title"] = "Historia Pojazdu";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Historia pojazdu: <span class="text-primary fw-bold">@Model.Vehicle.LicensePlate</span></h2>
+        <a asp-page="./Vehicles" class="btn btn-secondary shadow-sm">Powrót do bazy</a>
+    </div>
+
+    <!-- Dane szczegółowe pojazdu -->
+    <div class="card shadow-sm border-0 mb-4 bg-light">
+        <div class="card-body">
+            <div class="row text-center text-md-start">
+                <div class="col-md-4 mb-2 mb-md-0">
+                    <span class="text-muted d-block small text-uppercase">Model</span>
+                    <span class="fw-bold fs-5">@Model.Vehicle.Model</span>
+                </div>
+                <div class="col-md-4 mb-2 mb-md-0">
+                    <span class="text-muted d-block small text-uppercase">VIN</span>
+                    <span class="fw-bold fs-5">@(string.IsNullOrEmpty(Model.Vehicle.VIN) ? "Brak danych" : Model.Vehicle.VIN)</span>
+                </div>
+                <div class="col-md-4">
+                    <span class="text-muted d-block small text-uppercase">Przebieg</span>
+                    <span class="fw-bold fs-5 text-danger">@Model.Vehicle.Mileage km</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Zlecenia napraw (Historia serwisowa) -->
+        <div class="col-lg-7 mb-4">
+            <h4 class="mb-3 text-success border-bottom pb-2">Zlecenia napraw</h4>
+            @if (Model.RepairOrders.Any())
+            {
+                <div class="accordion shadow-sm" id="accordionRepairs">
+                    @foreach (var repair in Model.RepairOrders)
+                    {
+                        <div class="accordion-item border-0 border-bottom">
+                            <h2 class="accordion-header" id="heading-@repair.Id">
+                                <button class="accordion-button collapsed bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@repair.Id" aria-expanded="false" aria-controls="collapse-@repair.Id">
+                                    <div class="d-flex w-100 justify-content-between align-items-center me-3">
+                                        <div>
+                                            <span class="fw-bold text-dark d-block">Data wpisu: @repair.CreatedAt</span>
+                                            <span class="text-muted small text-truncate d-inline-block" style="max-width: 250px;">Zgłoszenie: @repair.ReportedIssues</span>
+                                        </div>
+                                        <span class="badge bg-primary">@repair.Status</span>
+                                    </div>
+                                </button>
+                            </h2>
+                            <div id="collapse-@repair.Id" class="accordion-collapse collapse" aria-labelledby="heading-@repair.Id" data-bs-parent="#accordionRepairs">
+                                <div class="accordion-body bg-light">
+                                    <p class="mb-2"><strong>Opis usterki:</strong> @repair.ReportedIssues</p>
+                                    @if (!string.IsNullOrEmpty(repair.CompletedAt))
+                                    {
+                                        <p class="mb-3 text-success"><strong>Zakończono:</strong> @repair.CompletedAt</p>
+                                    }
+                                    
+                                    <h6 class="fw-bold text-secondary mt-3 mb-2">Wymienione części:</h6>
+                                    @if (repair.OrderParts != null && repair.OrderParts.Any())
+                                    {
+                                        <ul class="list-group list-group-flush mb-0 border rounded">
+                                            @foreach (var part in repair.OrderParts)
+                                            {
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <span>@part.Part?.Name <span class="text-muted small">(ilość: @part.Quantity)</span></span>
+                                                    <span class="badge bg-secondary rounded-pill">@part.PriceAtTheTime zł / szt.</span>
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <div class="alert alert-secondary py-2 mb-0">Brak przypisanych części w tym zleceniu.</div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info shadow-sm border-0">Brak historii napraw dla tego pojazdu.</div>
+            }
+        </div>
+
+        <!-- Badania techniczne -->
+        <div class="col-lg-5 mb-4">
+            <h4 class="mb-3 text-warning text-darken border-bottom pb-2">Badania techniczne</h4>
+            @if (Model.TechnicalInspections.Any())
+            {
+                <div class="list-group shadow-sm">
+                    @foreach (var inspection in Model.TechnicalInspections)
+                    {
+                        <div class="list-group-item list-group-item-action flex-column align-items-start border-0 border-bottom">
+                            <div class="d-flex w-100 justify-content-between mb-2">
+                                <h6 class="mb-0 fw-bold">Data: @inspection.InspectionDate.ToShortDateString()</h6>
+                                @if (inspection.Result != null && (inspection.Result.Contains("Pozytywny") || inspection.Result.Contains("Zaliczone") || inspection.Result.Contains("OK")))
+                                {
+                                    <span class="badge bg-success">@inspection.Result</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">@(inspection.Result ?? "Brak danych")</span>
+                                }
+                            </div>
+                            <p class="mb-0 small text-muted">@inspection.Comments</p>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info shadow-sm border-0">Pojazd nie posiada zapisanych badań technicznych.</div>
+            }
+        </div>
+    </div>
+</div>

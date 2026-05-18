@@ -1,0 +1,69 @@
+@page
+@model Rzonca_Babik_FixCar4Us.Pages.Inventory.IndexModel
+@{
+    ViewData["Title"] = "Zarządzanie magazynem";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4 text-center">Zarządzanie magazynem</h1>
+    <p class="text-muted text-center mb-4">Rejestrowanie przychodów i rozchodów części. Wpisz wartość dodatnią aby dodać części do magazynu, lub ujemną aby je wydać (np. -2).</p>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+            <h3 class="card-title mb-0">Stan magazynowy części</h3>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0 align-middle text-center">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nazwa</th>
+                            <th>Numer seryjny</th>
+                            <th>Stan na magazynie</th>
+                            <th>Operacje magazynowe (Przychód / Rozchód)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Parts != null && Model.Parts.Any())
+                        {
+                            @foreach (var part in Model.Parts)
+                            {
+                                <tr>
+                                    <td>@part.Id</td>
+                                    <td>@part.Name</td>
+                                    <td>@part.PartNumber</td>
+                                    <td>
+                                        @if (part.StockQuantity > 0)
+                                        {
+                                            <span class="badge bg-success fs-6">@part.StockQuantity szt.</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger fs-6">Brak</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <form method="post" asp-page-handler="UpdateStock" class="d-flex justify-content-center m-0">
+                                            <input type="hidden" name="PartId" value="@part.Id" />
+                                            <div class="input-group input-group-sm" style="max-width: 250px;">
+                                                <input type="number" name="QuantityChange" class="form-control" placeholder="Ilość (np. 5 lub -2)" required />
+                                                <button type="submit" class="btn btn-outline-dark">Aktualizuj</button>
+                                            </div>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-muted py-3">Brak części w bazie danych.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

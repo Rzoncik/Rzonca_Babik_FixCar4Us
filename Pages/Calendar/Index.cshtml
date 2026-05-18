@@ -1,0 +1,103 @@
+@page
+@model Rzonca_Babik_FixCar4Us.Pages.Calendar.IndexModel
+@{
+    ViewData["Title"] = "Kalendarz przyjęć";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4 text-center">Kalendarz przyjęć</h1>
+    <p class="text-muted text-center mb-5">Planowanie terminów wizyt z przypisaniem auta do konkretnego stanowiska przyjęć.</p>
+
+    <div class="row">
+        <!-- Formularz dodawania nowej wizyty -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-info text-white">
+                    <h4 class="card-title mb-0">Dodaj nową wizytę</h4>
+                </div>
+                <div class="card-body bg-light">
+                    <form method="post">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Pojazd (Rejestracja - Model)</label>
+                            <select asp-for="NewAppointment.VehicleId" asp-items="Model.VehiclesList" class="form-select" required>
+                                <option value="">-- Wybierz pojazd --</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Stanowisko przyjęć</label>
+                            <select asp-for="NewAppointment.WorkstationId" asp-items="Model.WorkstationsList" class="form-select" required>
+                                <option value="">-- Wybierz stanowisko --</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Planowany początek</label>
+                            <input type="datetime-local" asp-for="NewAppointment.PlannedStart" class="form-control" required />
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Planowany koniec</label>
+                            <input type="datetime-local" asp-for="NewAppointment.PlannedEnd" class="form-control" required />
+                        </div>
+
+                        <button type="submit" class="btn btn-info w-100 text-white fw-bold shadow-sm">
+                            Zaplanuj wizytę
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tabela zaplanowanych wizyt -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="card-title mb-0">Zaplanowane wizyty</h4>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped mb-0 text-center align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Pojazd</th>
+                                    <th>Stanowisko</th>
+                                    <th>Rozpoczęcie</th>
+                                    <th>Zakończenie</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Appointments != null && Model.Appointments.Any())
+                                {
+                                    @foreach (var appointment in Model.Appointments)
+                                    {
+                                        <tr>
+                                            <td class="fw-bold text-primary">
+                                                @(appointment.VehicleId.HasValue && Model.VehiclesDict.ContainsKey(appointment.VehicleId.Value) 
+                                                    ? Model.VehiclesDict[appointment.VehicleId.Value] 
+                                                    : "Nieznany pojazd")
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary fs-6">
+                                                    @(appointment.Workstation?.Name ?? "Nie przypisano")
+                                                </span>
+                                            </td>
+                                            <td>@appointment.PlannedStart</td>
+                                            <td>@appointment.PlannedEnd</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-muted py-4">Brak zaplanowanych wizyt w kalendarzu.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

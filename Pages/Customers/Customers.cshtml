@@ -1,0 +1,79 @@
+@page
+@model Rzonca_Babik_FixCar4Us.Pages.CustomersModel
+@{
+    ViewData["Title"] = "Kartoteka Klientów";
+}
+
+<div class="text-center mb-4">
+    <h1 class="display-4">Kartoteka klientów</h1>
+</div>
+
+<main class="border rounded p-4 bg-white shadow-sm" style="min-height: 400px;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Lista Klientów</h3>
+        <a href="/Customers/Create" class="btn btn-success">Dodaj klienta</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Id</th>
+                    <th>Imię i Nazwisko / Nazwa</th>
+                    <th>Telefon</th>
+                    <th>Email</th>
+                    <th>Typ Klienta</th>
+                    <th>Zniżka</th>
+                    <th>Pojazdy (Historia)</th>
+                    <th>Akcje</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var customer in Model.Customers)
+                {
+                    <tr>
+                        <td>@customer.Id</td>
+                        <td>@customer.FirstName @customer.LastName</td>
+                        <td>@customer.PhoneNumber</td>
+                        <td>@customer.Email</td>
+                        <td>
+                            @if (customer.IsFleet == 1)
+                            {
+                                <span class="badge bg-primary">Flota</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Prywatny</span>
+                            }
+                        </td>
+                        <td>@(customer.DiscountRatePercent ?? 0)%</td>
+                        <td>
+                            @if (customer.Vehicles.Any())
+                            {
+                                <ul class="list-unstyled mb-0">
+                                    @foreach (var v in customer.Vehicles)
+                                    {
+                                        <li>@v.LicensePlate (@v.Model) - <a href="/Vehicles/Details?id=@v.Id">Naprawy</a></li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Brak aut</span>
+                            }
+                        </td>
+                        <td>
+                            <a href="/Customers/Edit?id=@customer.Id" class="btn btn-sm btn-warning">Edytuj</a>
+                        </td>
+                    </tr>
+                }
+                @if (Model.Customers.Count == 0)
+                {
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">Brak klientów w bazie. Dodaj nowego klienta!</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</main>
