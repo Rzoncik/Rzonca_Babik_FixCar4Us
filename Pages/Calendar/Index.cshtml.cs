@@ -60,6 +60,28 @@ namespace Rzonca_Babik_FixCar4Us.Pages.Calendar
             await LoadDataAsync();
             return Page();
         }
+
+        public async Task<IActionResult> OnPostCompleteAsync(int id)
+        {
+            var appointment = await _context.Appointments.FindAsync(id);
+            if (appointment != null)
+            {
+                appointment.Status = "Zakończone";
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToPage("./Index");
+        }
+
+        public async Task<IActionResult> OnPostDeleteAsync(int id)
+        {
+            var appointment = await _context.Appointments.FindAsync(id);
+            if (appointment != null)
+            {
+                _context.Appointments.Remove(appointment);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToPage("./Index");
+        }
         
         private async Task LoadDataAsync()
         {

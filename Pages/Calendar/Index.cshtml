@@ -59,12 +59,14 @@
                     <div class="table-responsive">
                         <table class="table table-hover table-striped mb-0 text-center align-middle">
                             <thead class="table-light">
-                                <tr>
-                                    <th>Pojazd</th>
-                                    <th>Stanowisko</th>
-                                    <th>Rozpoczęcie</th>
-                                    <th>Zakończenie</th>
-                                </tr>
+                                    <tr>
+                                        <th>Pojazd</th>
+                                        <th>Stanowisko</th>
+                                        <th>Rozpoczęcie</th>
+                                        <th>Zakończenie</th>
+                                        <th>Status</th>
+                                        <th>Akcje</th>
+                                    </tr>
                             </thead>
                             <tbody>
                                 @if (Model.Appointments != null && Model.Appointments.Any())
@@ -84,13 +86,38 @@
                                             </td>
                                             <td>@appointment.PlannedStart</td>
                                             <td>@appointment.PlannedEnd</td>
+                                            <td>
+                                                @if(appointment.Status == "Zakończone")
+                                                {
+                                                    <span class="badge bg-success fs-6">@appointment.Status</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning text-dark fs-6">@(appointment.Status ?? "Zaplanowane")</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="d-flex justify-content-center gap-2">
+                                                    @if(appointment.Status != "Zakończone")
+                                                    {
+                                                        <form method="post" asp-page-handler="Complete" class="m-0">
+                                                            <input type="hidden" name="id" value="@appointment.Id" />
+                                                            <button type="submit" class="btn btn-sm btn-success">Zakończ</button>
+                                                        </form>
+                                                    }
+                                                    <form method="post" asp-page-handler="Delete" class="m-0" onsubmit="return confirm('Czy na pewno chcesz usunąć tę wizytę?');">
+                                                        <input type="hidden" name="id" value="@appointment.Id" />
+                                                        <button type="submit" class="btn btn-sm btn-danger">Usuń</button>
+                                                    </form>
+                                                </div>
+                                            </td>
                                         </tr>
                                     }
                                 }
                                 else
                                 {
                                     <tr>
-                                        <td colspan="4" class="text-muted py-4">Brak zaplanowanych wizyt w kalendarzu.</td>
+                                        <td colspan="6" class="text-muted py-4">Brak zaplanowanych wizyt w kalendarzu.</td>
                                     </tr>
                                 }
                             </tbody>

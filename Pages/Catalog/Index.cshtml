@@ -8,62 +8,6 @@
     <h1 class="mb-4 text-center">Katalog części i usług</h1>
 
     <div class="row">
-        <!-- Części zamienne -->
-        <div class="col-md-12 mb-5">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h3 class="card-title mb-0">Części zamienne</h3>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-striped mb-0 text-center">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nazwa</th>
-                                    <th>Numer seryjny</th>
-                                    <th>Cena zakupu</th>
-                                    <th>Cena sprzedaży</th>
-                                    <th>Stan na magazynie</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (Model.Parts != null && Model.Parts.Any())
-                                {
-                                    @foreach (var part in Model.Parts)
-                                    {
-                                        <tr>
-                                            <td>@part.Id</td>
-                                            <td>@part.Name</td>
-                                            <td>@part.PartNumber</td>
-                                            <td>@part.PurchasePrice zł</td>
-                                            <td>@part.SalePrice zł</td>
-                                            <td>
-                                                @if (part.StockQuantity > 0)
-                                                {
-                                                    <span class="badge bg-success">@part.StockQuantity szt.</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="badge bg-danger">Brak</span>
-                                                }
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                                else
-                                {
-                                    <tr>
-                                        <td colspan="6" class="text-muted py-3">Brak części w bazie danych.</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Cennik Usług -->
         <div class="col-md-12">
             <div class="card shadow-sm border-0">

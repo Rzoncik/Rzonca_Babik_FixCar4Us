@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Rzonca_Babik_FixCar4Us.Models;
@@ -22,4 +22,6 @@ public partial class Appointment
     public virtual Employee? Employee { get; set; }
 
     public virtual Workstation? Workstation { get; set; }
+
+    public string? Status { get; set; } = "Zaplanowane";
 }

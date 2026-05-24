@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "8hlR6Xbqi50=",
+  "dgSpecHash": "Qdw/N0I10GQ=",
   "success": true,
   "projectFilePath": "/home/rzoncik/Dokumenty/Projekty/Rzonca_Babik_FixCar4Us/Rzonca_Babik_FixCar4Us/Rzonca_Babik_FixCar4Us.csproj",
   "expectedPackageFiles": [
@@ -21,16 +21,7 @@
     "/home/rzoncik/.nuget/packages/microsoft.entityframeworkcore.sqlite/10.0.7/microsoft.entityframeworkcore.sqlite.10.0.7.nupkg.sha512",
     "/home/rzoncik/.nuget/packages/microsoft.entityframeworkcore.sqlite.core/10.0.7/microsoft.entityframeworkcore.sqlite.core.10.0.7.nupkg.sha512",
     "/home/rzoncik/.nuget/packages/microsoft.entityframeworkcore.tools/10.0.7/microsoft.entityframeworkcore.tools.10.0.7.nupkg.sha512",
-    "/home/rzoncik/.nuget/packages/microsoft.extensions.caching.abstractions/10.0.7/microsoft.extensions.caching.abstractions.10.0.7.nupkg.sha512",
-    "/home/rzoncik/.nuget/packages/microsoft.extensions.caching.memory/10.0.7/microsoft.extensions.caching.memory.10.0.7.nupkg.sha512",
-    "/home/rzoncik/.nuget/packages/microsoft.extensions.configuration.abstractions/10.0.7/microsoft.extensions.configuration.abstractions.10.0.7.nupkg.sha512",
-    "/home/rzoncik/.nuget/packages/microsoft.extensions.dependencyinjection/10.0.7/microsoft.extensions.dependencyinjection.10.0.7.nupkg.sha512",
-    "/home/rzoncik/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/10.0.7/microsoft.extensions.dependencyinjection.abstractions.10.0.7.nupkg.sha512",
     "/home/rzoncik/.nuget/packages/microsoft.extensions.dependencymodel/10.0.7/microsoft.extensions.dependencymodel.10.0.7.nupkg.sha512",
-    "/home/rzoncik/.nuget/packages/microsoft.extensions.logging/10.0.7/microsoft.extensions.logging.10.0.7.nupkg.sha512",
-    "/home/rzoncik/.nuget/packages/microsoft.extensions.logging.abstractions/10.0.7/microsoft.extensions.logging.abstractions.10.0.7.nupkg.sha512",
-    "/home/rzoncik/.nuget/packages/microsoft.extensions.options/10.0.7/microsoft.extensions.options.10.0.7.nupkg.sha512",
-    "/home/rzoncik/.nuget/packages/microsoft.extensions.primitives/10.0.7/microsoft.extensions.primitives.10.0.7.nupkg.sha512",
     "/home/rzoncik/.nuget/packages/microsoft.visualstudio.solutionpersistence/1.0.52/microsoft.visualstudio.solutionpersistence.1.0.52.nupkg.sha512",
     "/home/rzoncik/.nuget/packages/mono.texttemplating/3.0.0/mono.texttemplating.3.0.0.nupkg.sha512",
     "/home/rzoncik/.nuget/packages/newtonsoft.json/13.0.3/newtonsoft.json.13.0.3.nupkg.sha512",
@@ -44,8 +35,7 @@
     "/home/rzoncik/.nuget/packages/system.composition.convention/9.0.0/system.composition.convention.9.0.0.nupkg.sha512",
     "/home/rzoncik/.nuget/packages/system.composition.hosting/9.0.0/system.composition.hosting.9.0.0.nupkg.sha512",
     "/home/rzoncik/.nuget/packages/system.composition.runtime/9.0.0/system.composition.runtime.9.0.0.nupkg.sha512",
-    "/home/rzoncik/.nuget/packages/system.composition.typedparts/9.0.0/system.composition.typedparts.9.0.0.nupkg.sha512",
-    "/home/rzoncik/.nuget/packages/microsoft.aspnetcore.app.ref/10.0.4/microsoft.aspnetcore.app.ref.10.0.4.nupkg.sha512"
+    "/home/rzoncik/.nuget/packages/system.composition.typedparts/9.0.0/system.composition.typedparts.9.0.0.nupkg.sha512"
   ],
   "logs": []
 }

@@ -1,0 +1,52 @@
+@page
+@model Rzonca_Babik_FixCar4Us.Pages.Inventory.CreateModel
+@{
+    ViewData["Title"] = "Dodaj część";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="card-title mb-0">Dodaj nową część do magazynu</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        <div class="mb-3">
+                            <label asp-for="NewPart.Name" class="form-label">Nazwa części</label>
+                            <input asp-for="NewPart.Name" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="NewPart.PartNumber" class="form-label">Numer seryjny (kod producenta)</label>
+                            <input asp-for="NewPart.PartNumber" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="NewPart.PurchasePrice" class="form-label">Cena zakupu</label>
+                            <div class="input-group">
+                                <input asp-for="NewPart.PurchasePrice" type="number" step="0.01" class="form-control" />
+                                <span class="input-group-text">PLN</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="NewPart.SalePrice" class="form-label">Cena sprzedaży</label>
+                            <div class="input-group">
+                                <input asp-for="NewPart.SalePrice" type="number" step="0.01" class="form-control" />
+                                <span class="input-group-text">PLN</span>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label asp-for="NewPart.StockQuantity" class="form-label">Początkowy stan na magazynie</label>
+                            <input asp-for="NewPart.StockQuantity" type="number" class="form-control" value="0" />
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a asp-page="./Index" class="btn btn-secondary">Anuluj i powrót</a>
+                            <button type="submit" class="btn btn-dark">Zapisz część</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

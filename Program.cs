@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Rzonca_Babik_FixCar4Us.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,9 @@ builder.Services.AddRazorPages();
 // Rejestracja połączenia z bazą SQLite
 builder.Services.AddDbContext<Rzonca_Babik_FixCar4Us.Data.AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Rejestracja Mediatora (Orkiestratora Warsztatu)
+builder.Services.AddScoped<IWorkshopMediator, WorkshopMediator>();
 
 var app = builder.Build();
 

@@ -17,17 +17,11 @@ namespace Rzonca_Babik_FixCar4Us.Pages.Catalog
         }
 
         // Listy przechowujące dane do wyświetlenia
-        public IList<Part> Parts { get; set; } = default!;
         public IList<Service> Services { get; set; } = default!;
 
         public async Task OnGetAsync()
         {
             // Proste pobranie danych z bazy, tak jak na zajęciach
-            if (_context.Parts != null)
-            {
-                Parts = await _context.Parts.ToListAsync();
-            }
-
             if (_context.Services != null)
             {
                 Services = await _context.Services.ToListAsync();
