@@ -1,27 +1,29 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Rzonca_Babik_FixCar4Us.Data;
 using Rzonca_Babik_FixCar4Us.Models;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Rzonca_Babik_FixCar4Us.Pages.Calendar
 {
     public class IndexModel : PageModel
     {
         private readonly AppDbContext _context;
+        private readonly Services.IWorkshopMediator _mediator;
 
-        public IndexModel(AppDbContext context)
+        public IndexModel(AppDbContext context, Services.IWorkshopMediator mediator)
         {
             _context = context;
+            _mediator = mediator;
         }
 
         // Lista wizyt do wyświetlenia
         public IList<Appointment> Appointments { get; set; } = default!;
-        
+
         // Słownik używany do szybkiego wyszukiwania nazwy pojazdu w widoku (ponieważ nie ma Navigation Property dla Vehicle w Appointment)
         public Dictionary<int, string> VehiclesDict { get; set; } = new Dictionary<int, string>();
 
@@ -42,6 +44,15 @@ namespace Rzonca_Babik_FixCar4Us.Pages.Calendar
             // Walidacja czy wybrano podstawowe informacje
             if (NewAppointment.VehicleId != null && NewAppointment.WorkstationId != null)
             {
+                // WZORZEC MEDIATOR: Sprawdzamy, czy można zaplanować wizytę bez konfliktów na warsztacie
+                if (!_mediator.TryScheduleAppointment(NewAppointment, out string errorMessage))
+                {
+                    // Jeśli Mediator zablokował rezerwację, zwracamy błąd do interfejsu (np. stanowisko jest zajęte)
+                    ModelState.AddModelError(string.Empty, errorMessage);
+                    await LoadDataAsync();
+                    return Page();
+                }
+
                 // Rozwiązanie dla ValueGeneratedNever() skonfigurowanego w DbContext:
                 int maxId = 0;
                 if (await _context.Appointments.AnyAsync())
@@ -52,7 +63,7 @@ namespace Rzonca_Babik_FixCar4Us.Pages.Calendar
 
                 _context.Appointments.Add(NewAppointment);
                 await _context.SaveChangesAsync();
-                
+
                 return RedirectToPage("./Index");
             }
 
@@ -82,7 +93,7 @@ namespace Rzonca_Babik_FixCar4Us.Pages.Calendar
             }
             return RedirectToPage("./Index");
         }
-        
+
         private async Task LoadDataAsync()
         {
             // Ładowanie wizyt posortowanych chronologicznie
@@ -90,7 +101,7 @@ namespace Rzonca_Babik_FixCar4Us.Pages.Calendar
             {
                 Appointments = await _context.Appointments
                     .Include(a => a.Workstation) // Wciągamy dane powiązanego stanowiska
-                    .OrderBy(a => a.PlannedStart) 
+                    .OrderBy(a => a.PlannedStart)
                     .ToListAsync();
             }
 
@@ -99,7 +110,7 @@ namespace Rzonca_Babik_FixCar4Us.Pages.Calendar
             {
                 var vehicles = await _context.Vehicles.ToListAsync();
                 VehiclesDict = vehicles.ToDictionary(v => v.Id, v => $"{v.LicensePlate} ({v.Model})");
-                
+
                 var vehicleOptions = vehicles.Select(v => new { v.Id, DisplayName = $"{v.LicensePlate} - {v.Model}" });
                 VehiclesList = new SelectList(vehicleOptions, "Id", "DisplayName");
             }

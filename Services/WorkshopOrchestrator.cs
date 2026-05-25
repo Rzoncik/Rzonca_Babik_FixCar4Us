@@ -27,7 +27,7 @@ namespace Rzonca_Babik_FixCar4Us.Services
         // Pomocnicza metoda do sprawdzania nakładania się dat (jako studenci używamy prostych ifów)
         protected bool DatesOverlap(string? dbStartStr, string? dbEndStr, DateTime checkStart, DateTime checkEnd)
         {
-            if (string.IsNullOrEmpty(dbStartStr) || string.IsNullOrEmpty(dbEndStr)) 
+            if (string.IsNullOrEmpty(dbStartStr) || string.IsNullOrEmpty(dbEndStr))
                 return false;
 
             if (DateTime.TryParse(dbStartStr, out DateTime dbStart) && DateTime.TryParse(dbEndStr, out DateTime dbEnd))
@@ -54,7 +54,7 @@ namespace Rzonca_Babik_FixCar4Us.Services
         {
             var overlapping = _context.Appointments.AsEnumerable()
                 .Any(a => a.EmployeeId == resourceId && DatesOverlap(a.PlannedStart, a.PlannedEnd, start, end));
-            
+
             return !overlapping; // true, jeśli nie ma nakładających się terminów
         }
     }
@@ -72,7 +72,7 @@ namespace Rzonca_Babik_FixCar4Us.Services
         {
             var overlapping = _context.Appointments.AsEnumerable()
                 .Any(a => a.WorkstationId == resourceId && DatesOverlap(a.PlannedStart, a.PlannedEnd, start, end));
-            
+
             return !overlapping;
         }
     }
@@ -90,7 +90,7 @@ namespace Rzonca_Babik_FixCar4Us.Services
         {
             var overlapping = _context.Appointments.AsEnumerable()
                 .Any(a => a.ToolId == resourceId && DatesOverlap(a.PlannedStart, a.PlannedEnd, start, end));
-            
+
             return !overlapping;
         }
     }
@@ -108,7 +108,7 @@ namespace Rzonca_Babik_FixCar4Us.Services
         public WorkshopMediator(AppDbContext context)
         {
             _context = context;
-            
+
             // Inicjalizujemy kolegów i przekazujemy im referencję do samego siebie (this)
             _employeeColleague = new EmployeeColleague(this, _context);
             _workstationColleague = new WorkstationColleague(this, _context);
@@ -121,10 +121,10 @@ namespace Rzonca_Babik_FixCar4Us.Services
 
             if (resourceType == "Employee" && _employeeColleague != null)
                 return _employeeColleague.IsAvailable(resourceId.Value, start, end);
-            
+
             if (resourceType == "Workstation" && _workstationColleague != null)
                 return _workstationColleague.IsAvailable(resourceId.Value, start, end);
-            
+
             if (resourceType == "Tool" && _toolColleague != null)
                 return _toolColleague.IsAvailable(resourceId.Value, start, end);
 
@@ -134,7 +134,7 @@ namespace Rzonca_Babik_FixCar4Us.Services
         // Główna metoda Orkiestratora - koordynuje wszystkie zasoby na raz
         public bool TryScheduleAppointment(Appointment appointment, out string message)
         {
-            if (!DateTime.TryParse(appointment.PlannedStart, out DateTime start) || 
+            if (!DateTime.TryParse(appointment.PlannedStart, out DateTime start) ||
                 !DateTime.TryParse(appointment.PlannedEnd, out DateTime end))
             {
                 message = "Wprowadzono nieprawidłowy format daty.";
@@ -149,7 +149,7 @@ namespace Rzonca_Babik_FixCar4Us.Services
             }
 
             // Zgodnie z wymaganiami, naprawa wymaga jednoczesnej dostępności 3 elementów:
-            
+
             // 1. Sprawdzamy mechanika
             if (!CheckAvailability("Employee", appointment.EmployeeId, start, end))
             {

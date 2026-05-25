@@ -17,6 +17,7 @@
                 </div>
                 <div class="card-body bg-light">
                     <form method="post">
+                        <div asp-validation-summary="All" class="text-danger fw-bold mb-3"></div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Pojazd (Rejestracja - Model)</label>
                             <select asp-for="NewAppointment.VehicleId" asp-items="Model.VehiclesList" class="form-select" required>

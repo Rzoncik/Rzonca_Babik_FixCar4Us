@@ -13,6 +13,22 @@ builder.Services.AddDbContext<Rzonca_Babik_FixCar4Us.Data.AppDbContext>(options 
 // Rejestracja Mediatora (Orkiestratora Warsztatu)
 builder.Services.AddScoped<IWorkshopMediator, WorkshopMediator>();
 
+// Rejestracja Silnika Wyceny (Pricing Engine)
+builder.Services.AddScoped<RepairPricingEngine>();
+
+// Rejestracja Systemu Zarządzania Etapami i Cofania (Rollback Engine)
+builder.Services.AddScoped<RepairRollbackEngine>();
+
+// Rejestracja Wzorca Builder do budowy zleceń
+builder.Services.AddTransient<IRepairOrderBuilder, RepairOrderBuilder>();
+builder.Services.AddTransient<RepairOrderDirector>();
+
+// Rejestracja Wzorca Facade dla Panelu Mechanika
+builder.Services.AddScoped<IMechanicPanelFacade, MechanicPanelFacade>();
+
+// Rejestracja Wzorca Observer (Powiadomienia)
+builder.Services.AddScoped<IRepairOrderNotifier, RepairOrderNotifier>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
