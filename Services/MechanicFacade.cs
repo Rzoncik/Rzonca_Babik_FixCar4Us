@@ -52,17 +52,47 @@ namespace Rzonca_Babik_FixCar4Us.Services
             if (order == null) return false;
 
             // KROK 1: Logowanie czasu pracy i usługi
-            var loggedService = new OrderService 
+            var existingService = _context.OrderServices.FirstOrDefault(os => os.RepairOrderId == repairOrderId && os.ServiceId == serviceId);
+            
+            if (existingService != null)
             {
-                RepairOrderId = repairOrderId,
-                ServiceId = serviceId,
-                LoggedHours = loggedHours
-            };
-            _context.OrderServices.Add(loggedService);
+                // Aktualizujemy istniejący rekord zamiast dodawać nowy (żeby nie powielać wpisów)
+                existingService.LoggedHours = loggedHours;
+                
+                // Uzupełnij CustomerId jeśli z jakiegoś powodu go brakuje
+                if (existingService.CustomerId == null && order.VehicleId.HasValue)
+                {
+                    var orderVehicle = _context.Vehicles.Find(order.VehicleId.Value);
+                    if (orderVehicle != null) existingService.CustomerId = orderVehicle.CustomerId;
+                }
+            }
+            else
+            {
+                int maxOrderServiceId = _context.OrderServices.Any() ? _context.OrderServices.Max(o => o.Id) : 0;
+                
+                // Pobierz ID klienta z pojazdu
+                int? customerId = null;
+                if (order.VehicleId.HasValue)
+                {
+                    var orderVehicle = _context.Vehicles.Find(order.VehicleId.Value);
+                    if (orderVehicle != null) customerId = orderVehicle.CustomerId;
+                }
+
+                var loggedService = new OrderService 
+                {
+                    Id = maxOrderServiceId + 1,
+                    RepairOrderId = repairOrderId,
+                    ServiceId = serviceId,
+                    CustomerId = customerId,
+                    LoggedHours = loggedHours
+                };
+                _context.OrderServices.Add(loggedService);
+            }
 
             // KROK 2: Pobieranie użytych części z magazynu oraz dodanie ich do zamówienia
             if (partsUsed != null && partsUsed.Any())
             {
+                int maxOrderPartId = _context.OrderParts.Any() ? _context.OrderParts.Max(o => o.Id) : 0;
                 foreach (var usage in partsUsed)
                 {
                     var partInDb = _context.Parts.Find(usage.PartId);
@@ -70,10 +100,13 @@ namespace Rzonca_Babik_FixCar4Us.Services
                     {
                         // a) Pomniejszenie stanu magazynowego 
                         partInDb.StockQuantity -= usage.Quantity;
+                        _context.Parts.Update(partInDb); // Wymuszamy aktualizację w EF Core
 
                         // b) Przypisanie części do zamówienia jako "zużytej"
+                        maxOrderPartId++;
                         var orderPart = new OrderPart
                         {
+                            Id = maxOrderPartId,
                             RepairOrderId = repairOrderId,
                             PartId = usage.PartId,
                             Quantity = usage.Quantity,
@@ -92,8 +125,10 @@ namespace Rzonca_Babik_FixCar4Us.Services
             }
 
             // KROK 4: Dodanie wpisu do historii zlecenia, że mechanik zakończył dany etap
+            int maxHistoryLogId = _context.RepairHistoryLogs.Any() ? _context.RepairHistoryLogs.Max(h => h.Id) : 0;
             var historyLog = new RepairHistoryLog
             {
+                Id = maxHistoryLogId + 1,
                 RepairOrderId = repairOrderId,
                 StageAction = $"[ZMIANA FASADOWA] Przejście na status: {nextStatus}, zalogowano {loggedHours}h",
                 Timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),

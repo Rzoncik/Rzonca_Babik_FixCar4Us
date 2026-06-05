@@ -31,12 +31,28 @@ build_property._RazorSourceGeneratorDebug =
 build_property.EffectiveAnalysisLevelStyle = 10.0
 build_property.EnableCodeStyleSeverity = 
 
-[/home/rzoncik/Dokumenty/Projekty/Rzonca_Babik_FixCar4Us/Rzonca_Babik_FixCar4Us/Pages/Calendar/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ2FsZW5kYXIvSW5kZXguY3NodG1s
+[/home/rzoncik/Dokumenty/Projekty/Rzonca_Babik_FixCar4Us/Rzonca_Babik_FixCar4Us/Pages/Admin.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/rzoncik/Dokumenty/Projekty/Rzonca_Babik_FixCar4Us/Rzonca_Babik_FixCar4Us/Pages/AdminLogin.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW5Mb2dpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/rzoncik/Dokumenty/Projekty/Rzonca_Babik_FixCar4Us/Rzonca_Babik_FixCar4Us/Pages/BookAppointment.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQm9va0FwcG9pbnRtZW50LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/rzoncik/Dokumenty/Projekty/Rzonca_Babik_FixCar4Us/Rzonca_Babik_FixCar4Us/Pages/Catalog/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ2F0YWxvZy9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/rzoncik/Dokumenty/Projekty/Rzonca_Babik_FixCar4Us/Rzonca_Babik_FixCar4Us/Pages/ClientLogin.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ2xpZW50TG9naW4uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/rzoncik/Dokumenty/Projekty/Rzonca_Babik_FixCar4Us/Rzonca_Babik_FixCar4Us/Pages/CustomerLogin.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ3VzdG9tZXJMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/rzoncik/Dokumenty/Projekty/Rzonca_Babik_FixCar4Us/Rzonca_Babik_FixCar4Us/Pages/Customers/Create.cshtml]
@@ -49,6 +65,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/home/rzoncik/Dokumenty/Projekty/Rzonca_Babik_FixCar4Us/Rzonca_Babik_FixCar4Us/Pages/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvRXJyb3IuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/rzoncik/Dokumenty/Projekty/Rzonca_Babik_FixCar4Us/Rzonca_Babik_FixCar4Us/Pages/FleetBookAppointment.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvRmxlZXRCb29rQXBwb2ludG1lbnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/rzoncik/Dokumenty/Projekty/Rzonca_Babik_FixCar4Us/Rzonca_Babik_FixCar4Us/Pages/Index.cshtml]
@@ -65,6 +85,22 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/home/rzoncik/Dokumenty/Projekty/Rzonca_Babik_FixCar4Us/Rzonca_Babik_FixCar4Us/Pages/MechanicPanel/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTWVjaGFuaWNQYW5lbC9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/rzoncik/Dokumenty/Projekty/Rzonca_Babik_FixCar4Us/Rzonca_Babik_FixCar4Us/Pages/MyVehicles/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTXlWZWhpY2xlcy9DcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/rzoncik/Dokumenty/Projekty/Rzonca_Babik_FixCar4Us/Rzonca_Babik_FixCar4Us/Pages/MyVehicles/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTXlWZWhpY2xlcy9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/rzoncik/Dokumenty/Projekty/Rzonca_Babik_FixCar4Us/Rzonca_Babik_FixCar4Us/Pages/RepairHistory/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUmVwYWlySGlzdG9yeS9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/rzoncik/Dokumenty/Projekty/Rzonca_Babik_FixCar4Us/Rzonca_Babik_FixCar4Us/Pages/RepairStatus/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUmVwYWlyU3RhdHVzL0luZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/rzoncik/Dokumenty/Projekty/Rzonca_Babik_FixCar4Us/Rzonca_Babik_FixCar4Us/Pages/Shared/_ValidationScriptsPartial.cshtml]

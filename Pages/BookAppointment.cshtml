@@ -1,0 +1,95 @@
+@page
+@model Rzonca_Babik_FixCar4Us.Pages.BookAppointmentModel
+@{
+    ViewData["Title"] = "Umów wizytę";
+    ViewData["IsClientPage"] = true;
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h2 class="mb-4 text-center text-primary fw-bold">Umów się na naprawę</h2>
+            <p class="text-center text-muted mb-5">Wypełnij poniższy formularz, a my zajmiemy się resztą.</p>
+
+            @if (Model.IsSuccess)
+            {
+                <div class="alert alert-success text-center shadow-sm p-5 border-0 rounded-4">
+                    <h4 class="alert-heading display-6 mb-3">Udało się!</h4>
+                    <p class="lead mb-4">Twoje zgłoszenie zostało przyjęte. Skontaktujemy się z Tobą w celu potwierdzenia terminu.</p>
+                    <hr class="mb-4">
+                    <a asp-page="/Index" class="btn btn-success btn-lg px-5">Wróć na stronę główną</a>
+                </div>
+            }
+            else
+            {
+                <div class="card shadow border-0 rounded-4">
+                    <div class="card-body p-4 p-md-5">
+                        <form method="post">
+
+                            <h4 class="mb-4 text-secondary border-bottom pb-2">Wybierz pojazd</h4>
+                            @if (Model.PreSelectedVehicle != null)
+                            {
+                                <div class="alert alert-info mb-5 fs-5">
+                                    <i class="bi bi-car-front-fill me-2"></i> <strong>Umawiasz:</strong> @Model.PreSelectedVehicle.Model <span class="badge bg-secondary ms-2">@Model.PreSelectedVehicle.LicensePlate</span>
+                                </div>
+                                <input type="hidden" asp-for="SelectedVehicleId" />
+                            }
+                            else if (Model.Vehicles.Count == 0)
+                            {
+                                <div class="alert alert-warning mb-5">
+                                    Nie masz żadnych pojazdów na swoim koncie. Dodaj pojazd w zakładce <a asp-page="/MyVehicles/Index">Moje Pojazdy</a> przed umówieniem wizyty.
+                                </div>
+                            }
+                            else
+                            {
+                                <span asp-validation-for="SelectedVehicleId" class="text-danger d-block mb-2"></span>
+                                <div class="table-responsive mb-5">
+                                    <table class="table table-hover border">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Wybór</th>
+                                                <th>Pojazd</th>
+                                                <th>Nr rej.</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var v in Model.Vehicles)
+                                            {
+                                                <tr>
+                                                    <td class="align-middle text-center">
+                                                        <div class="form-check d-inline-block">
+                                                            <input class="form-check-input" type="radio" asp-for="SelectedVehicleId" value="@v.Id" id="vehicle_@v.Id" required>
+                                                        </div>
+                                                    </td>
+                                                    <td class="align-middle"><label class="form-check-label d-block w-100" for="vehicle_@v.Id">@v.Model</label></td>
+                                                    <td class="align-middle"><label class="form-check-label d-block w-100" for="vehicle_@v.Id">@v.LicensePlate</label></td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+
+                            <h4 class="mb-4 text-secondary border-bottom pb-2">Wybór usługi</h4>
+                            <div class="mb-4">
+                                <label asp-for="SelectedServiceId" class="form-label fw-bold">Wybierz usługę do wykonania</label>
+                                <select asp-for="SelectedServiceId" asp-items="Model.ServicesList" class="form-select form-select-lg bg-light border-0" required>
+                                    <option value="">-- Wybierz usługę z listy --</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-5">
+                                <label asp-for="ReportedIssues" class="form-label fw-bold">Krótki opis usterki / Uwagi (opcjonalnie)</label>
+                                <textarea asp-for="ReportedIssues" class="form-control form-control-lg bg-light border-0" rows="3" placeholder="np. Stuka pod maską, proszę o sprawdzenie zawieszenia..."></textarea>
+                            </div>
+
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg rounded-pill py-3 fw-bold shadow-sm">Wyślij zgłoszenie</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -19,5 +19,9 @@ public partial class Customer
 
     public double? DiscountRatePercent { get; set; }
 
+    public string? PasswordHash { get; set; }
+
     public virtual ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
+
+    public virtual ICollection<OrderService> OrderServices { get; set; } = new List<OrderService>();
 }

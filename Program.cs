@@ -43,6 +43,31 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
+// Własne middleware do zabezpieczenia paneli pracowniczych
+app.Use(async (context, next) =>
+{
+    var path = context.Request.Path.Value ?? "";
+    bool isAdminRoute = (path.StartsWith("/Admin", StringComparison.OrdinalIgnoreCase) && !path.StartsWith("/AdminLogin", StringComparison.OrdinalIgnoreCase)) ||
+                        path.StartsWith("/Calendar", StringComparison.OrdinalIgnoreCase) ||
+                        path.StartsWith("/Catalog", StringComparison.OrdinalIgnoreCase) ||
+                        path.StartsWith("/Customers", StringComparison.OrdinalIgnoreCase) ||
+                        path.StartsWith("/Inventory", StringComparison.OrdinalIgnoreCase) ||
+                        path.StartsWith("/MechanicPanel", StringComparison.OrdinalIgnoreCase) ||
+                        path.StartsWith("/RepairHistory", StringComparison.OrdinalIgnoreCase) ||
+                        path.StartsWith("/Vehicles", StringComparison.OrdinalIgnoreCase);
+
+    if (isAdminRoute)
+    {
+        if (!context.Request.Cookies.ContainsKey("LoggedEmployeeId"))
+        {
+            context.Response.Redirect("/AdminLogin");
+            return;
+        }
+    }
+
+    await next();
+});
+
 app.UseAuthorization();
 
 app.MapStaticAssets();

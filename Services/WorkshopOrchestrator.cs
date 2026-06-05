@@ -89,7 +89,8 @@ namespace Rzonca_Babik_FixCar4Us.Services
         public override bool IsAvailable(int resourceId, DateTime start, DateTime end)
         {
             var overlapping = _context.Appointments.AsEnumerable()
-                .Any(a => a.ToolId == resourceId && DatesOverlap(a.PlannedStart, a.PlannedEnd, start, end));
+                .Any(a => (a.ToolId == resourceId || a.ToolId2 == resourceId || a.ToolId3 == resourceId) 
+                          && DatesOverlap(a.PlannedStart, a.PlannedEnd, start, end));
 
             return !overlapping;
         }
@@ -165,9 +166,11 @@ namespace Rzonca_Babik_FixCar4Us.Services
             }
 
             // 3. Sprawdzamy narzędzia specjalistyczne
-            if (!CheckAvailability("Tool", appointment.ToolId, start, end))
+            if (!CheckAvailability("Tool", appointment.ToolId, start, end) ||
+                !CheckAvailability("Tool", appointment.ToolId2, start, end) ||
+                !CheckAvailability("Tool", appointment.ToolId3, start, end))
             {
-                message = "Wybrane narzędzie specjalistyczne jest używane przy innej naprawie w tym czasie.";
+                message = "Jedno z wybranych narzędzi specjalistycznych jest używane przy innej naprawie w tym czasie.";
                 return false;
             }
 

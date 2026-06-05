@@ -19,5 +19,7 @@ public partial class RepairOrder
 
     public virtual ICollection<OrderPart> OrderParts { get; set; } = new List<OrderPart>();
     
+    public virtual ICollection<OrderService> OrderServices { get; set; } = new List<OrderService>();
+    
     public virtual Vehicle? Vehicle { get; set; }
 }

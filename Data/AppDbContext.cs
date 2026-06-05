@@ -83,6 +83,7 @@ public partial class AppDbContext : DbContext
 
             entity.HasOne(d => d.Part).WithMany(p => p.OrderParts).HasForeignKey(d => d.PartId);
 
+
             entity.HasOne(d => d.RepairOrder).WithMany(p => p.OrderParts).HasForeignKey(d => d.RepairOrderId);
         });
 
@@ -91,6 +92,10 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Id).ValueGeneratedNever();
 
             entity.HasOne(d => d.Service).WithMany(p => p.OrderServices).HasForeignKey(d => d.ServiceId);
+
+            entity.HasOne(d => d.RepairOrder).WithMany(p => p.OrderServices).HasForeignKey(d => d.RepairOrderId);
+
+            entity.HasOne(d => d.Customer).WithMany(p => p.OrderServices).HasForeignKey(d => d.CustomerId);
         });
 
         modelBuilder.Entity<Part>(entity =>

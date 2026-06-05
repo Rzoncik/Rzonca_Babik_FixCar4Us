@@ -27,38 +27,75 @@
                             </h6>
                             <p class="card-text mb-4">
                                 <strong>Zgłoszone usterki:</strong><br />
-                                @(order.ReportedIssues ?? "Brak opisu usterki")
+                                @(order.ReportedIssues ?? "Brak opisu usterki")<br />
+                                <strong>Wybrana usługa:</strong><br />
+                                @(order.OrderServices?.FirstOrDefault()?.Service?.Name ?? "Nie określono")
                             </p>
 
-                            <form method="post" asp-page-handler="AdvanceStage">
-                                <input type="hidden" asp-for="SelectedOrderId" value="@order.Id" />
-                                
-                                <div class="row g-2 mb-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label small fw-bold">ID Wykonywanej Usługi</label>
-                                        <input type="number" asp-for="ServiceId" class="form-control form-control-sm" required placeholder="Naciśnij 1 dla testów" />
+                            @if (order.Status == "Oczekujące na termin" || order.Status == "Nowe")
+                            {
+                                <form method="post" asp-page-handler="Schedule">
+                                    <input type="hidden" name="SelectedOrderId" value="@order.Id" />
+                                    
+                                    <div asp-validation-summary="All" class="text-danger fw-bold mb-3"></div>
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Planowany początek</label>
+                                            <input type="datetime-local" asp-for="PlannedStart" class="form-control form-control-sm" required />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Planowany koniec</label>
+                                            <input type="datetime-local" asp-for="PlannedEnd" class="form-control form-control-sm" required />
+                                        </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label small fw-bold">Przepracowane Godziny</label>
-                                        <input type="number" step="0.5" asp-for="LoggedHours" class="form-control form-control-sm" required />
+                                    <div class="row g-2 mb-4">
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Stanowisko pracy</label>
+                                            <select asp-for="SelectedWorkstationId" asp-items='(SelectList)ViewData["WorkstationsList"]' class="form-select form-select-sm" required>
+                                                <option value="">-- Wybierz stanowisko --</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Wymagane narzędzie (Opcjonalnie)</label>
+                                            <select asp-for="SelectedToolId" asp-items='(SelectList)ViewData["ToolsList"]' class="form-select form-select-sm">
+                                                <option value="">-- Brak narzędzia --</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
-                                
-                                <div class="row g-2 mb-4 bg-light p-2 rounded">
-                                    <div class="col-md-8">
-                                        <label class="form-label small fw-bold">ID Zużytej Części (opcjonalnie)</label>
-                                        <input type="number" asp-for="PartIdToConsume" class="form-control form-control-sm" placeholder="np. 1" />
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label small fw-bold">Ilość sztuk</label>
-                                        <input type="number" asp-for="QuantityToConsume" class="form-control form-control-sm" value="0" />
-                                    </div>
-                                </div>
 
-                                <button type="submit" class="btn btn-danger w-100 fw-bold">
-                                    Zatwierdź pracę i przejdź do następnego etapu
-                                </button>
-                            </form>
+                                    <button type="submit" class="btn btn-primary w-100 fw-bold">
+                                        Zaplanuj termin i narzędzia
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form method="post" asp-page-handler="AdvanceStage">
+                                    <input type="hidden" name="SelectedOrderId" value="@order.Id" />
+                                    
+                                    @if (order.Status == "W naprawie")
+                                    {
+                                        <div class="row g-2 mb-4 bg-light p-2 rounded">
+                                            <div class="col-md-8">
+                                                <label class="form-label small fw-bold">Zużyta Część (opcjonalnie)</label>
+                                                <select name="PartIdToConsume" asp-items="Model.PartsList" class="form-select form-select-sm">
+                                                    <option value="0">-- Brak (nie zużyto) --</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label small fw-bold">Ilość sztuk</label>
+                                                <input type="number" name="QuantityToConsume" class="form-control form-control-sm" value="0" />
+                                            </div>
+                                        </div>
+                                    }
+
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-danger fw-bold">
+                                            Zatwierdź pracę (godziny obliczą się same)
+                                        </button>
+                                    </div>
+                                </form>
+                            }
                         </div>
                     </div>
                 </div>

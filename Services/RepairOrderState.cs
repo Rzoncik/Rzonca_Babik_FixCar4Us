@@ -67,58 +67,21 @@ namespace Rzonca_Babik_FixCar4Us.Services
     {
         public void NextState(RepairOrderContext context)
         {
-            // Po Przyjęciu, auto zawsze idzie do diagnostyki
-            context.SetState(new InDiagnosticsState());
-        }
-
-        public void SkipToRepair(RepairOrderContext context)
-        {
-            // Jeśli klient wie, co jest zepsute, pomijamy diagnostykę
+            // Po Przyjęciu auto idzie prosto do naprawy
             context.SetState(new InRepairState());
         }
+
+        public void SkipToRepair(RepairOrderContext context) { }
 
         public string GetStatusName() => "Przyjęte";
-    }
-
-    public class InDiagnosticsState : IRepairState
-    {
-        public void NextState(RepairOrderContext context)
-        {
-            // Po diagnostyce zazwyczaj musimy zamówić części
-            context.SetState(new WaitingForPartsState());
-        }
-
-        public void SkipToRepair(RepairOrderContext context)
-        {
-            // Jeśli mamy części na stanie, omijamy oczekiwanie
-            context.SetState(new InRepairState());
-        }
-
-        public string GetStatusName() => "W diagnostyce";
-    }
-
-    public class WaitingForPartsState : IRepairState
-    {
-        public void NextState(RepairOrderContext context)
-        {
-            // Gdy części przyjdą, ruszamy z naprawą
-            context.SetState(new InRepairState());
-        }
-
-        public void SkipToRepair(RepairOrderContext context)
-        {
-            // Jesteśmy już w trakcie procesu, ta metoda tu nie ma sensu - ignorujemy
-        }
-
-        public string GetStatusName() => "Oczekiwanie na części";
     }
 
     public class InRepairState : IRepairState
     {
         public void NextState(RepairOrderContext context)
         {
-            // Po naprawie auto jest gotowe
-            context.SetState(new ReadyForPickupState());
+            // Po naprawie auto jest zakończone
+            context.SetState(new CompletedState());
             
             // Logika specyficzna dla przejścia: ustawiamy datę zakończenia
             context.Order.CompletedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
@@ -129,17 +92,13 @@ namespace Rzonca_Babik_FixCar4Us.Services
         public string GetStatusName() => "W naprawie";
     }
 
-    public class ReadyForPickupState : IRepairState
+    public class CompletedState : IRepairState
     {
-        public void NextState(RepairOrderContext context)
-        {
-            // Jesteśmy w stanie końcowym, dalej się nie da
-            // Moglibyśmy rzucić wyjątkiem lub zignorować
-        }
+        public void NextState(RepairOrderContext context) { }
 
         public void SkipToRepair(RepairOrderContext context) { }
 
-        public string GetStatusName() => "Gotowe do odbioru";
+        public string GetStatusName() => "Zakończone";
     }
 
     // =========================================================================
@@ -152,10 +111,8 @@ namespace Rzonca_Babik_FixCar4Us.Services
             return status switch
             {
                 "Przyjęte" => new AcceptedState(),
-                "W diagnostyce" => new InDiagnosticsState(),
-                "Oczekiwanie na części" => new WaitingForPartsState(),
                 "W naprawie" => new InRepairState(),
-                "Gotowe do odbioru" => new ReadyForPickupState(),
+                "Zakończone" => new CompletedState(),
                 _ => new AcceptedState() // Domyślny startowy
             };
         }

@@ -4,6 +4,8 @@ trigger: always_on
 
 Program w C# z wykorzystaniem bazy SQLite oraz frontendem Razor. Pisz jak student na drugim roku informatyki dlatego wykorzystuj proste formuły. Nie pisz jak senior developer z 10 letnim stażem. Dostosuj się do poniższych wymagań.
 
+Baza danych database.db znajduje sie w /home/rzoncik/Dokumenty/Projekty/Rzonca_Babik_FixCar4Us/Rzonca_Babik_FixCar4Us
+
 -----------------------------------------------------------------------
 
 - [System Zarządzania Warsztatem Samochodowym (FixCar4Us)]()

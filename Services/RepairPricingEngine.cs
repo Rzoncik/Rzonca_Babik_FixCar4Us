@@ -220,6 +220,15 @@ namespace Rzonca_Babik_FixCar4Us.Services
             {
                 finalCost = new FleetDiscountDecorator(finalCost, 0.15); // 15% zniżki
             }
+            
+            var customFleetDiscount = activeDecorators.FirstOrDefault(d => d.StartsWith("FleetDiscount:"));
+            if (customFleetDiscount != null)
+            {
+                if (double.TryParse(customFleetDiscount.Split(':')[1], System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsedDiscount))
+                {
+                    finalCost = new FleetDiscountDecorator(finalCost, parsedDiscount);
+                }
+            }
 
             return finalCost;
         }

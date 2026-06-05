@@ -2,14 +2,54 @@
 @model IndexModel
 @{
     ViewData["Title"] = "Strona Główna";
+    ViewData["IsClientPage"] = true;
 }
 
-<div class="text-center mb-4">
-    <h1 class="display-4">Witamy w systemie FixCar4Us</h1>
-    <p class="lead">Wybierz moduł z górnego menu, aby rozpocząć pracę.</p>
-</div>
+<div class="container text-center py-5">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
-<!-- Główny obszar roboczy, zgodnie z prośbą -->
-<main class="border rounded p-4 bg-white shadow-sm" style="min-height: 400px;">
-    <!-- Miejsce na zawartość do wpisania przez użytkownika -->
-</main>
+    <h1 class="display-3 fw-bold text-primary mb-4">FixCar4Us</h1>
+    <p class="lead mb-5">Profesjonalne usługi naprawy samochodów. Szybko, solidnie i w dobrej cenie.</p>
+    
+    <div class="row justify-content-center gap-4 mb-5">
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <h3 class="card-title h5">Sprawdź status naprawy</h3>
+                    <p class="card-text text-muted flex-grow-1">Dowiedz się, na jakim etapie jest naprawa Twojego samochodu.</p>
+                    <a asp-page="/RepairStatus/Index" class="btn btn-primary mt-3">Sprawdź Status</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <h3 class="card-title h5">Moje Pojazdy</h3>
+                    <p class="card-text text-muted flex-grow-1">Zarządzaj swoimi pojazdami i zgłaszaj ich naprawy.</p>
+                    <a asp-page="/MyVehicles/Index" class="btn btn-info mt-3 text-white">Przeglądaj</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <h3 class="card-title h5">Umów wizytę</h3>
+                    <p class="card-text text-muted flex-grow-1">Zarezerwuj termin w naszym warsztacie szybko i wygodnie.</p>
+                    <a asp-page="/BookAppointment" class="btn btn-success mt-3">Umów</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-5 d-flex justify-content-center gap-3">
+        <a asp-page="/CustomerLogin" class="btn btn-primary">Zaloguj jako Klient</a>
+        <a asp-page="/ClientLogin" class="btn btn-outline-primary">Zarejestruj jako Klient</a>
+        <a asp-page="/AdminLogin" class="btn btn-outline-secondary">Zaloguj jako pracownik (Admin)</a>
+    </div>
+</div>

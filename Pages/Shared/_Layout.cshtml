@@ -18,26 +18,37 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="navbar-collapse collapse d-sm-inline-flex">
-                <ul class="navbar-nav flex-grow-1 gap-2">
-                    <li class="nav-item">
-                        <a class="btn btn-outline-primary" asp-area="" asp-page="/Vehicles/Vehicles">Baza pojazdów</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="btn btn-outline-success" asp-area="" asp-page="/Customers/Customers">Kartoteka klientów</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="btn btn-outline-secondary" asp-area="" asp-page="/Catalog/Index">Katalog części i usług</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="btn btn-outline-warning" asp-area="" asp-page="/Inventory/Index">Zarządzanie magazynem</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="btn btn-outline-info" asp-area="" asp-page="/Calendar/Index">Kalendarz przyjęć</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="btn btn-danger text-white fw-bold shadow-sm" asp-area="" asp-page="/MechanicPanel/Index">Panel Mechanika</a>
-                    </li>
-                </ul>
+                @if (ViewData["IsClientPage"] is bool isClient && isClient)
+                {
+                    <ul class="navbar-nav ms-auto gap-2">
+                        <li class="nav-item">
+                            <a class="btn btn-outline-dark" asp-area="" asp-page="/Admin">Admin</a>
+                        </li>
+                    </ul>
+                }
+                else
+                {
+                    <ul class="navbar-nav flex-grow-1 gap-2">
+                        <li class="nav-item">
+                            <a class="btn btn-outline-primary" asp-area="" asp-page="/Vehicles/Vehicles">Baza pojazdów</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-outline-success" asp-area="" asp-page="/Customers/Customers">Kartoteka klientów</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-outline-secondary" asp-area="" asp-page="/Catalog/Index">Katalog części i usług</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-outline-warning" asp-area="" asp-page="/Inventory/Index">Zarządzanie magazynem</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-outline-info" asp-area="" asp-page="/MechanicPanel/Index">Panel Mechanika</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-outline-dark" asp-area="" asp-page="/RepairHistory/Index">Historia Zleceń</a>
+                        </li>
+                    </ul>
+                }
             </div>
         </div>
     </nav>

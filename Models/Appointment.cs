@@ -15,6 +15,10 @@ public partial class Appointment
 
     public int? ToolId { get; set; }
 
+    public int? ToolId2 { get; set; }
+
+    public int? ToolId3 { get; set; }
+
     public string? PlannedStart { get; set; }
 
     public string? PlannedEnd { get; set; }

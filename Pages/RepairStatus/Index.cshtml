@@ -1,0 +1,88 @@
+@page
+@model Rzonca_Babik_FixCar4Us.Pages.RepairStatus.IndexModel
+@{
+    ViewData["Title"] = "Status Naprawy";
+    ViewData["IsClientPage"] = true;
+}
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <h2 class="text-primary fw-bold">Sprawdź status naprawy</h2>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success shadow-sm rounded-3 mb-4">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (Model.CustomerOrders == null || Model.CustomerOrders.Count == 0)
+    {
+        <div class="alert alert-info text-center p-5 shadow-sm rounded-4">
+            <h4 class="alert-heading mb-3">Brak aktywnych zgłoszeń</h4>
+            <p class="mb-0">Nie masz jeszcze żadnych historii napraw. Przejdź do zakładki <a asp-page="/MyVehicles/Index">Moje Pojazdy</a> aby umówić wizytę.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var order in Model.CustomerOrders)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0 rounded-4">
+                        <div class="card-header @(order.Status == "Zakończone" ? "bg-success text-white" : (order.Status == "Opłacone" ? "bg-dark text-white" : "bg-primary text-white")) p-3 rounded-top-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0 fw-bold">Zlecenie #@order.Id</h5>
+                                <span class="badge bg-light text-dark">@order.Status</span>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <h6 class="card-subtitle mb-3 text-muted">@order.Vehicle?.Model (@order.Vehicle?.LicensePlate)</h6>
+                            <p class="card-text small mb-2"><strong>Utworzono:</strong> @order.CreatedAt</p>
+                            @if (!string.IsNullOrEmpty(order.CompletedAt))
+                            {
+                                <p class="card-text small mb-2"><strong>Zakończono:</strong> @order.CompletedAt</p>
+                            }
+                            
+                            <hr />
+                            
+                            <p class="card-text small text-muted mb-3" style="min-height: 40px;">
+                                <strong>Opis:</strong><br />
+                                @order.ReportedIssues
+                            </p>
+                            
+                            @{
+                                double total = order.OrderServices.Sum(s => s.FinalPrice ?? 0);
+                            }
+                            
+                            @if (total > 0)
+                            {
+                                <div class="bg-light p-3 rounded-3 mb-3 text-center">
+                                    <span class="d-block text-muted small text-uppercase fw-bold">Suma do zapłaty</span>
+                                    <h4 class="mb-0 text-dark fw-bold">@total.ToString("C")</h4>
+                                </div>
+                            }
+
+                            @if (order.Status == "Zakończone")
+                            {
+                                <form method="post" asp-page-handler="Pay">
+                                    <input type="hidden" name="orderId" value="@order.Id" />
+                                    <button type="submit" class="btn btn-success w-100 fw-bold py-2 shadow-sm">
+                                        <i class="bi bi-credit-card me-2"></i>Opłać naprawę
+                                    </button>
+                                </form>
+                            }
+                            else if (order.Status == "Opłacone")
+                            {
+                                <button class="btn btn-outline-secondary w-100 fw-bold py-2 disabled">
+                                    <i class="bi bi-check2-all me-2"></i>Opłacone
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
