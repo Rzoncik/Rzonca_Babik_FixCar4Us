@@ -31,13 +31,15 @@ namespace Rzonca_Babik_FixCar4Us.Services
     {
         private readonly AppDbContext _context;
         private readonly IRepairOrderNotifier _notifier;
+        private readonly RepairPricingEngine _pricingEngine;
 
         // Wstrzykujemy kontekst bazy danych oraz system powiadomień
-        public MechanicPanelFacade(AppDbContext context, IRepairOrderNotifier notifier)
+        public MechanicPanelFacade(AppDbContext context, IRepairOrderNotifier notifier, RepairPricingEngine pricingEngine)
         {
             _context = context;
             _notifier = notifier;
-            
+            _pricingEngine = pricingEngine;
+
             // Rejestracja obserwatorów (w prawdziwej aplikacji można to robić w DI lub konfiguracji)
             _notifier.Attach(new EmailNotificationObserver());
             _notifier.Attach(new SmsNotificationObserver());
@@ -53,12 +55,37 @@ namespace Rzonca_Babik_FixCar4Us.Services
 
             // KROK 1: Logowanie czasu pracy i usługi
             var existingService = _context.OrderServices.FirstOrDefault(os => os.RepairOrderId == repairOrderId && os.ServiceId == serviceId);
-            
+
+            // --- AUTOMATYCZNE OBLICZANIE CZASU NAPRAWY ---
+            double autoCalculatedHours = loggedHours;
+            // Sprawdzamy nextStatus, ponieważ order.Status został już zmutowany w kontrolerze przez RepairOrderContext.NextState()
+            // Etap "W naprawie" zawsze przechodzi do "Wycena dodatkowa"
+            if (nextStatus == "Wycena dodatkowa")
+            {
+                var startLog = _context.RepairHistoryLogs
+                    .Where(l => l.RepairOrderId == repairOrderId && l.StageAction != null && l.StageAction.Contains("Przejście na status: W naprawie"))
+                    .OrderByDescending(l => l.Id)
+                    .FirstOrDefault();
+
+                if (startLog != null && DateTime.TryParse(startLog.Timestamp, out DateTime startTime))
+                {
+                    autoCalculatedHours = (DateTime.Now - startTime).TotalHours;
+                    autoCalculatedHours = Math.Round(autoCalculatedHours, 2);
+                    if (autoCalculatedHours < 0.5) autoCalculatedHours = 0.5; // minimum pół godziny
+                }
+            }
+            else if (existingService != null)
+            {
+                // Dla innych statusów (np. przejście po Wycenie) zachowujemy istniejący czas
+                autoCalculatedHours = existingService.LoggedHours ?? 0;
+            }
+            loggedHours = autoCalculatedHours; // Nadpisujemy czas na automatycznie obliczony
+
             if (existingService != null)
             {
                 // Aktualizujemy istniejący rekord zamiast dodawać nowy (żeby nie powielać wpisów)
                 existingService.LoggedHours = loggedHours;
-                
+
                 // Uzupełnij CustomerId jeśli z jakiegoś powodu go brakuje
                 if (existingService.CustomerId == null && order.VehicleId.HasValue)
                 {
@@ -69,7 +96,7 @@ namespace Rzonca_Babik_FixCar4Us.Services
             else
             {
                 int maxOrderServiceId = _context.OrderServices.Any() ? _context.OrderServices.Max(o => o.Id) : 0;
-                
+
                 // Pobierz ID klienta z pojazdu
                 int? customerId = null;
                 if (order.VehicleId.HasValue)
@@ -78,7 +105,7 @@ namespace Rzonca_Babik_FixCar4Us.Services
                     if (orderVehicle != null) customerId = orderVehicle.CustomerId;
                 }
 
-                var loggedService = new OrderService 
+                var loggedService = new OrderService
                 {
                     Id = maxOrderServiceId + 1,
                     RepairOrderId = repairOrderId,
@@ -122,6 +149,42 @@ namespace Rzonca_Babik_FixCar4Us.Services
             if (nextStatus == "Gotowe do odbioru" || nextStatus == "Zakończone")
             {
                 order.CompletedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
+
+                // --- Generowanie Ostatecznego Kosztorysu przy użyciu Pricing Engine ---
+                var orderParts = _context.OrderParts.Where(p => p.RepairOrderId == repairOrderId).ToList();
+                double partsTotal = orderParts.Sum(p => (p.Quantity ?? 0) * (p.PriceAtTheTime ?? 0.0));
+
+                var service = _context.Services.Find(serviceId);
+                double baseHourlyRate = service?.BaseHourlyRate ?? 150.0;
+
+                // Używamy zaktualizowanego czasu pracy
+                double totalHours = existingService != null ? (existingService.LoggedHours ?? 0) : loggedHours;
+
+                ILaborPricingStrategy strategy = new RealTimePricingStrategy();
+                IRepairCost finalCost = new BaseRepairCost(partsTotal, strategy.CalculateLaborCost(baseHourlyRate, totalHours, 0, 0));
+
+                // Jeśli mechanik wpisał opłatę dodatkową, dekorujemy koszt
+                if (order.AdditionalFee > 0)
+                {
+                    finalCost = new CustomFeeDecorator(finalCost, order.AdditionalFee, order.DifficultyDescription ?? "Opłata dodatkowa");
+                }
+
+                // Dodanie rabatu flotowego jeśli to zlecenie flotowe
+                if (order.IsFleet == 1)
+                {
+                    finalCost = new FleetDiscountDecorator(finalCost, 0.15); // 15% rabatu flotowego dla końcowej wyceny
+                }
+
+                // Zapisz całkowity kosztorys
+                if (existingService != null)
+                {
+                    existingService.FinalPrice = finalCost.GetTotalCost();
+                }
+                else
+                {
+                    var newService = _context.OrderServices.Local.FirstOrDefault(os => os.RepairOrderId == repairOrderId && os.ServiceId == serviceId);
+                    if (newService != null) newService.FinalPrice = finalCost.GetTotalCost();
+                }
             }
 
             // KROK 4: Dodanie wpisu do historii zlecenia, że mechanik zakończył dany etap

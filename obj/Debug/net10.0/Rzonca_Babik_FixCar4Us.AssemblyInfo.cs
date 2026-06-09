@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Rzonca_Babik_FixCar4Us")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+46794561274b39eee841b9917a3afe371961294c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+693b618b5d71a0892f9bb4a81b62008f5ec04002")]
 [assembly: System.Reflection.AssemblyProductAttribute("Rzonca_Babik_FixCar4Us")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Rzonca_Babik_FixCar4Us")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

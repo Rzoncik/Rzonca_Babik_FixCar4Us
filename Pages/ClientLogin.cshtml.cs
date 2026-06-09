@@ -46,7 +46,6 @@ namespace Rzonca_Babik_FixCar4Us.Pages
                 LastName = Input.LastName,
                 PhoneNumber = Input.PhoneNumber,
                 Email = Input.Email,
-                IsFleet = Input.IsFleet ? 1 : 0,
                 PasswordHash = hash
             };
 
@@ -75,9 +74,6 @@ namespace Rzonca_Babik_FixCar4Us.Pages
             [EmailAddress(ErrorMessage = "Niepoprawny format adresu email")]
             [Display(Name = "Email")]
             public string Email { get; set; }
-
-            [Display(Name = "Czy klient jest flotą?")]
-            public bool IsFleet { get; set; }
 
             [Required(ErrorMessage = "Hasło jest wymagane")]
             [DataType(DataType.Password)]

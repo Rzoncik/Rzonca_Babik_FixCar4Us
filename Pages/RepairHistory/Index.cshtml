@@ -31,6 +31,7 @@
                                 <th>Data przyjęcia</th>
                                 <th>Data zakończenia</th>
                                 <th>Status</th>
+                                <th>Mechanik</th>
                                 <th class="pe-4 text-end">Zgłoszone uwagi</th>
                             </tr>
                         </thead>
@@ -43,14 +44,15 @@
                                         @if (order.Vehicle?.Customer != null)
                                         {
                                             @order.Vehicle.Customer.FirstName @order.Vehicle.Customer.LastName
-                                            @if (order.Vehicle.Customer.IsFleet == 1)
-                                            {
-                                                <span class="badge bg-warning text-dark ms-1">Flota</span>
-                                            }
                                         }
                                         else
                                         {
                                             <span class="text-muted">Brak danych</span>
+                                        }
+                                        
+                                        @if (order.IsFleet == 1)
+                                        {
+                                            <span class="badge bg-warning text-dark ms-1">Flota</span>
                                         }
                                     </td>
                                     <td>
@@ -70,6 +72,28 @@
                                         <span class="badge @(order.Status == "Opłacone" ? "bg-secondary" : "bg-success") px-3 py-2">
                                             <i class="bi @(order.Status == "Opłacone" ? "bi-check2-all" : "bi-check-circle") me-1"></i>@order.Status
                                         </span>
+                                    </td>
+                                    <td>
+                                        @if (order.Employee != null)
+                                        {
+                                            <div><strong>@order.Employee.FirstName @order.Employee.LastName</strong></div>
+                                            <div class="small text-muted"><i class="bi bi-telephone"></i> @order.Employee.PhoneNumber</div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">Brak</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (order.Employee != null)
+                                        {
+                                            <div><strong>@order.Employee.FirstName @order.Employee.LastName</strong></div>
+                                            <div class="small text-muted"><i class="bi bi-telephone"></i> @order.Employee.PhoneNumber</div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">Brak</span>
+                                        }
                                     </td>
                                     <td class="pe-4 text-end text-muted small">
                                         <div style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block;" title="@order.ReportedIssues">

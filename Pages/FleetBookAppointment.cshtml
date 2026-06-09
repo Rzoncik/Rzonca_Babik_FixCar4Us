@@ -89,6 +89,11 @@
                                     </table>
                                 </div>
 
+                                <div class="mb-5">
+                                    <label asp-for="ReportedIssues" class="form-label fw-bold">Krótki opis usterki / Uwagi (opcjonalnie)</label>
+                                    <textarea asp-for="ReportedIssues" class="form-control form-control-lg bg-light border-0" rows="3" placeholder="np. Stuka pod maską, proszę o sprawdzenie zawieszenia... (Opis zostanie dołączony do wszystkich wybranych pojazdów)"></textarea>
+                                </div>
+
                                 <div class="alert alert-info border-0 rounded-3 mb-4">
                                     <strong>Wskazówka:</strong> System przetworzy zlecenia tylko dla pojazdów zaznaczonych "ptaszkiem" (checkboxem). Jeśli dla zaznaczonego pojazdu nie wybierzesz usługi z listy, zgłoszenie to pominie wybór domyślnej usługi.
                                 </div>

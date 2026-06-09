@@ -1,31 +1,114 @@
 html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
+  font-size: 1rem;
+  background-image: url(../images/background.webp);
+  background-size: 100%;
+  background-repeat: repeat-y;
+  background-position: center bottom;
+  width: 100%;
+  min-height: 100vh;
   position: relative;
   min-height: 100%;
+
 }
 
 body {
   margin-bottom: 60px;
+  background-color: transparent;
+  color: white;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+.logo {
+  height: 10rem;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+.text-motto {
+  text-shadow: 2px 2px 3px black;
+}
+
+.main-section {
+  background-color: rgba(0, 0, 0, 0.5);
+  border: 1px solid white;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+a {
+  font-size: 1.2rem;
+}
+
+nav {
+  width: 100%;
+  padding: fit-content;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+nav ul {
+  width: 100%;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  gap: 2rem;
+}
+
+li {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.form {
+  width: fit-content;
+  background-color: rgba(0, 0, 0, 0.5);
+  border: 1px solid white;
+  border-radius: 10px;
+  padding: 2rem;
+  margin-top: 10rem;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid white;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #2222223a;
+  background-image: repeating-linear-gradient(-45deg,
+      transparent,
+      transparent 3px,
+      rgba(0, 0, 0, 0.1) 3px,
+      rgba(255, 255, 255, 0.1) 6px);
+}
+
+select,
+textarea {
+  background-color: transparent;
+  color: white;
+  border-radius: 10px;
+  border: 1px solid white;
+  padding: 10px;
+  width: 100%;
+}
+
+th,
+td {
+  padding: 10px;
+  border-right: 1px solid white;
+  border-bottom: 1px solid white;
+}
+
+table tbody tr:last-child th,
+table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+table th:last-child,
+table td:last-child {
+  border-right: none;
 }

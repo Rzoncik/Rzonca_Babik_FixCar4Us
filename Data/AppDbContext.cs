@@ -41,7 +41,7 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<Vehicle> Vehicles { get; set; }
 
     public virtual DbSet<Workstation> Workstations { get; set; }
-    
+
     public virtual DbSet<TechnicalInspection> TechnicalInspections { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -111,6 +111,8 @@ public partial class AppDbContext : DbContext
         modelBuilder.Entity<RepairOrder>(entity =>
         {
             entity.Property(e => e.Id).ValueGeneratedNever();
+
+            entity.HasOne(d => d.Employee).WithMany().HasForeignKey(d => d.EmployeeId);
         });
 
         modelBuilder.Entity<Service>(entity =>

@@ -11,6 +11,14 @@ using Rzonca_Babik_FixCar4Us.Services;
 
 namespace Rzonca_Babik_FixCar4Us.Pages.MechanicPanel
 {
+    public class CalendarEventDto
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Start { get; set; } = string.Empty;
+        public string End { get; set; } = string.Empty;
+        public string Color { get; set; } = string.Empty;
+    }
+
     public class IndexModel : PageModel
     {
         private readonly AppDbContext _context;
@@ -25,6 +33,7 @@ namespace Rzonca_Babik_FixCar4Us.Pages.MechanicPanel
         }
 
         public IList<RepairOrder> ActiveOrders { get; set; } = default!;
+        public IList<CalendarEventDto> CalendarEvents { get; set; } = new List<CalendarEventDto>();
 
         public SelectList ServicesList { get; set; } = default!;
         public SelectList PartsList { get; set; } = default!;
@@ -50,6 +59,9 @@ namespace Rzonca_Babik_FixCar4Us.Pages.MechanicPanel
         [BindProperty]
         public int SelectedWorkstationId { get; set; }
 
+        [BindProperty]
+        public int SelectedEmployeeId { get; set; }
+
         public async Task OnGetAsync()
         {
             await LoadActiveOrders();
@@ -67,55 +79,65 @@ namespace Rzonca_Babik_FixCar4Us.Pages.MechanicPanel
             stateContext.NextState();
             string newValidStatus = stateContext.GetStatusName();
 
-            // Odczytujemy wartości bezpośrednio z formularza, pomijając potencjalne błędy bindowania
-            int partId = 0;
-            int quantity = 0;
-            
-            if (Request.Form.ContainsKey("PartIdToConsume") && int.TryParse(Request.Form["PartIdToConsume"], out int pId))
+            if (Request.Form.ContainsKey("AdditionalFee") && double.TryParse(Request.Form["AdditionalFee"].ToString().Replace(',', '.'), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double fee))
             {
-                partId = pId;
+                order.AdditionalFee = fee;
             }
-            if (Request.Form.ContainsKey("QuantityToConsume") && int.TryParse(Request.Form["QuantityToConsume"], out int q))
+            if (Request.Form.ContainsKey("DifficultyDescription"))
             {
-                quantity = q;
+                order.DifficultyDescription = Request.Form["DifficultyDescription"];
             }
 
             // Używamy Fasady, która za jednym zamachem: loguje godziny, zużywa części i zmienia status
             var parts = new List<PartUsageDto>();
-            if (partId > 0 && quantity > 0)
+            if (PartIdToConsume >= 0 && QuantityToConsume > 0)
             {
-                var part = await _context.Parts.FindAsync(partId);
+                var part = await _context.Parts.FindAsync(PartIdToConsume);
                 if (part != null)
                 {
+                    double price = part.SalePrice ?? 0;
+                    if (Request.Form.ContainsKey("IsReplacementPart") && Request.Form["IsReplacementPart"] == "on")
+                    {
+                        price = price * 0.5;
+                    }
+
                     parts.Add(new PartUsageDto
                     {
                         PartId = part.Id,
-                        Quantity = quantity,
-                        CurrentPrice = part.SalePrice ?? 0
+                        Quantity = QuantityToConsume,
+                        CurrentPrice = price
                     });
                 }
             }
 
-            // Obliczanie przepracowanych godzin na podstawie terminów wizyty
-            double calculatedHours = 1; // domyślna wartość
-            var appointment = await _context.Appointments
-                .Where(a => a.VehicleId == order.VehicleId)
-                .OrderByDescending(a => a.Id)
-                .FirstOrDefaultAsync();
-
-            if (appointment != null && !string.IsNullOrEmpty(appointment.PlannedStart) && !string.IsNullOrEmpty(appointment.PlannedEnd))
-            {
-                if (DateTime.TryParse(appointment.PlannedStart, out DateTime start) && DateTime.TryParse(appointment.PlannedEnd, out DateTime end))
-                {
-                    calculatedHours = (end - start).TotalHours;
-                    if (calculatedHours < 0.5) calculatedHours = 0.5; // minimum pół godziny
-                }
-            }
+            // Czas pracy będzie teraz automatycznie obliczany w Fasadzie na podstawie historii logów
+            double calculatedHours = 0;
 
             int serviceId = order.OrderServices.FirstOrDefault()?.ServiceId ?? 1;
 
             // Jeden strzał z Fasady zamiast wielkiego spaghetti
             _facade.LogWorkAndCompleteStage(order.Id, serviceId, calculatedHours, parts, newValidStatus);
+
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostRollbackStageAsync()
+        {
+            var order = await _context.RepairOrders
+                .Include(r => r.OrderServices)
+                .FirstOrDefaultAsync(r => r.Id == SelectedOrderId);
+            if (order == null || order.Status == "Zakończone" || order.Status == "Opłacone")
+                return RedirectToPage();
+
+            // Używamy wzorca State, by cofnąć status
+            var stateContext = new RepairOrderContext(order);
+            stateContext.PreviousState();
+            string newValidStatus = stateContext.GetStatusName();
+
+            // Fasada aktualizuje status w logach.
+            // Przy cofaniu nie dodajemy części ani czasu
+            int serviceId = order.OrderServices.FirstOrDefault()?.ServiceId ?? 1;
+            _facade.LogWorkAndCompleteStage(order.Id, serviceId, 0, new List<PartUsageDto>(), newValidStatus);
 
             return RedirectToPage();
         }
@@ -136,6 +158,7 @@ namespace Rzonca_Babik_FixCar4Us.Pages.MechanicPanel
                 PlannedEnd = PlannedEnd,
                 ToolId = SelectedToolId,
                 WorkstationId = SelectedWorkstationId,
+                EmployeeId = SelectedEmployeeId,
                 Status = "Zaplanowane"
             };
 
@@ -148,9 +171,10 @@ namespace Rzonca_Babik_FixCar4Us.Pages.MechanicPanel
             }
 
             _context.Appointments.Add(appointment);
-            
-            // Po zaplanowaniu przenosimy do statusu "Przyjęte"
+
+            // Po zaplanowaniu przenosimy do statusu "Przyjęte" i przypisujemy pracownika
             order.Status = "Przyjęte";
+            order.EmployeeId = SelectedEmployeeId;
             await _context.SaveChangesAsync();
 
             return RedirectToPage();
@@ -160,10 +184,34 @@ namespace Rzonca_Babik_FixCar4Us.Pages.MechanicPanel
         {
             ActiveOrders = await _context.RepairOrders
                 .Include(r => r.Vehicle)
+                .Include(r => r.Employee)
                 .Include(r => r.OrderServices)
                 .ThenInclude(os => os.Service)
-                .Where(r => r.Status != "Gotowe do odbioru" && r.Status != "Zakończone") // Pokazuj tylko niezakończone
+                .Where(r => r.Status != "Gotowe do odbioru" && r.Status != "Zakończone" && r.Status != "Opłacone") // Pokazuj tylko niezakończone i nieopłacone
                 .ToListAsync();
+
+            var appointments = await _context.Appointments
+                .Where(a => a.PlannedStart != null && a.PlannedEnd != null)
+                .ToListAsync();
+
+            CalendarEvents.Clear();
+            foreach (var app in appointments)
+            {
+                string licensePlate = "Brak";
+                if (app.VehicleId.HasValue)
+                {
+                    var vehicle = await _context.Vehicles.FindAsync(app.VehicleId.Value);
+                    if (vehicle != null) licensePlate = vehicle.LicensePlate ?? "Brak";
+                }
+
+                CalendarEvents.Add(new CalendarEventDto
+                {
+                    Title = $"Naprawa: {licensePlate} - {app.Status}",
+                    Start = app.PlannedStart!,
+                    End = app.PlannedEnd!,
+                    Color = app.Status == "Zaplanowane" ? "#0d6efd" : (app.Status == "W trakcie" ? "#ffc107" : "#198754")
+                });
+            }
 
             var services = await _context.Services.ToListAsync();
             ServicesList = new SelectList(services, "Id", "Name");
@@ -176,6 +224,12 @@ namespace Rzonca_Babik_FixCar4Us.Pages.MechanicPanel
 
             var workstations = await _context.Workstations.ToListAsync();
             ViewData["WorkstationsList"] = new SelectList(workstations, "Id", "Name");
+
+            var employees = await _context.Employees.ToListAsync();
+            ViewData["EmployeesList"] = new SelectList(employees.Select(e => new {
+                Id = e.Id,
+                FullName = e.FirstName + " " + e.LastName + " (" + e.Speciality + ")"
+            }), "Id", "FullName");
         }
     }
 }

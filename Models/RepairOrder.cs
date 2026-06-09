@@ -18,8 +18,18 @@ public partial class RepairOrder
     public string? CompletedAt { get; set; }
 
     public virtual ICollection<OrderPart> OrderParts { get; set; } = new List<OrderPart>();
-    
+
     public virtual ICollection<OrderService> OrderServices { get; set; } = new List<OrderService>();
-    
+
     public virtual Vehicle? Vehicle { get; set; }
+
+    public double AdditionalFee { get; set; }
+
+    public string? DifficultyDescription { get; set; }
+
+    public int? IsFleet { get; set; }
+
+    public int? EmployeeId { get; set; }
+
+    public virtual Employee? Employee { get; set; }
 }

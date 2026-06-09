@@ -17,5 +17,7 @@ public partial class Employee
 
     public string? Speciality { get; set; }
 
+    public string? PhoneNumber { get; set; }
+
     public virtual ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
 }

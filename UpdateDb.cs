@@ -12,9 +12,14 @@ class UpdateDb
             try
             {
                 var command = connection.CreateCommand();
-                command.CommandText = "ALTER TABLE Customers ADD COLUMN PasswordHash TEXT;";
+                command.CommandText = "ALTER TABLE RepairOrders ADD COLUMN AdditionalFee REAL DEFAULT 0;";
                 command.ExecuteNonQuery();
-                Console.WriteLine("Added PasswordHash column to Customers table.");
+                Console.WriteLine("Added AdditionalFee column to RepairOrders table.");
+                
+                var command2 = connection.CreateCommand();
+                command2.CommandText = "ALTER TABLE RepairOrders ADD COLUMN DifficultyDescription TEXT;";
+                command2.ExecuteNonQuery();
+                Console.WriteLine("Added DifficultyDescription column to RepairOrders table.");
             }
             catch (Exception ex)
             {

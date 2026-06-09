@@ -28,6 +28,9 @@ namespace Rzonca_Babik_FixCar4Us.Pages
         [BindProperty]
         public List<int> SelectedVehicles { get; set; } = new List<int>();
 
+        [BindProperty]
+        public string? ReportedIssues { get; set; }
+
         public bool IsSuccess { get; set; } = false;
         public List<string> SuccessMessages { get; set; } = new List<string>();
 
@@ -40,10 +43,10 @@ namespace Rzonca_Babik_FixCar4Us.Pages
             }
 
             var customer = await _context.Customers.FindAsync(customerId);
-            if (customer == null || customer.IsFleet == 0)
+            if (customer == null)
             {
-                TempData["SuccessMessage"] = "Ta strona jest dostępna tylko dla klientów flotowych.";
-                return RedirectToPage("/MyVehicles/Index");
+                TempData["SuccessMessage"] = "Ta strona jest dostępna tylko dla zarejestrowanych klientów.";
+                return RedirectToPage("/Index");
             }
 
             Vehicles = await _context.Vehicles.Where(v => v.CustomerId == customerId).ToListAsync();
@@ -61,7 +64,7 @@ namespace Rzonca_Babik_FixCar4Us.Pages
             }
 
             var customer = await _context.Customers.FindAsync(customerId);
-            if (customer == null || customer.IsFleet == 0)
+            if (customer == null)
             {
                 return RedirectToPage("/Index");
             }
@@ -96,6 +99,11 @@ namespace Rzonca_Babik_FixCar4Us.Pages
                     string vehicleName = vehicle != null ? $"{vehicle.Model} ({vehicle.LicensePlate})" : $"Pojazd ID {vehicleId}";
                     string issueText = selectedService?.Name ?? "Wizyta flotowa";
 
+                    if (!string.IsNullOrWhiteSpace(ReportedIssues))
+                    {
+                        issueText += " | Opis usterki/Uwagi: " + ReportedIssues;
+                    }
+
                     // ========================================================
                     // Logika wyceny flotowej (Pricing Engine)
                     // ========================================================
@@ -108,14 +116,6 @@ namespace Rzonca_Babik_FixCar4Us.Pages
                         activeDecorators.Add($"FleetDiscount:{discountPercent.ToString(System.Globalization.CultureInfo.InvariantCulture)}");
                     }
 
-                    // 2. Randomizacja: 20% szans na wystąpienie nieprzewidzianych trudności w naprawie (np. urwane śruby)
-                    bool hasDifficultAccess = false;
-                    if (rnd.NextDouble() < 0.20)
-                    {
-                        activeDecorators.Add("DifficultAccess");
-                        hasDifficultAccess = true;
-                    }
-
                     // Symulacja ceny bazowej
                     var strategy = new Services.FlatRatePricingStrategy();
                     double baseRate = selectedService?.BaseHourlyRate ?? 150.0;
@@ -126,8 +126,7 @@ namespace Rzonca_Babik_FixCar4Us.Pages
                     issueText += " (Zgłoszenie flotowe). Wycena szacunkowa:\n" + estimatedCost.GetDescription();
                     
                     SuccessMessages.Add($"{vehicleName}: Wyceniono na <strong>{estimatedCost.GetTotalCost():C}</strong>. " +
-                                        $"{(discountPercent > 0 ? $"<span class='badge bg-success'>Rabat {discountPercent * 100}%</span>" : "")} " +
-                                        $"{(hasDifficultAccess ? "<span class='badge bg-danger'>⚠️ Trudny dostęp!</span>" : "")}");
+                                        $"{(discountPercent > 0 ? $"<span class='badge bg-success'>Rabat {discountPercent * 100}%</span>" : "")}");
 
                     maxOrderId++;
                     var newOrder = new RepairOrder
@@ -136,7 +135,8 @@ namespace Rzonca_Babik_FixCar4Us.Pages
                         VehicleId = vehicleId,
                         Status = "Oczekujące na termin",
                         CreatedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm"),
-                        ReportedIssues = issueText
+                        ReportedIssues = issueText,
+                        IsFleet = 1
                     };
                     _context.RepairOrders.Add(newOrder);
 

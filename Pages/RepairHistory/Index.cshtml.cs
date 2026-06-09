@@ -25,6 +25,7 @@ namespace Rzonca_Babik_FixCar4Us.Pages.RepairHistory
             CompletedOrders = await _context.RepairOrders
                 .Include(r => r.Vehicle)
                 .ThenInclude(v => v.Customer)
+                .Include(r => r.Employee)
                 .Where(r => r.Status == "Zakończone" || r.Status == "Opłacone")
                 .OrderByDescending(r => r.CompletedAt)
                 .ToListAsync();

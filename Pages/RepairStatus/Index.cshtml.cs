@@ -1,11 +1,11 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Rzonca_Babik_FixCar4Us.Data;
 using Rzonca_Babik_FixCar4Us.Models;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Rzonca_Babik_FixCar4Us.Pages.RepairStatus
 {
@@ -19,7 +19,7 @@ namespace Rzonca_Babik_FixCar4Us.Pages.RepairStatus
         }
 
         public IList<RepairOrder> CustomerOrders { get; set; } = default!;
-        
+
         public bool IsSuccess { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
@@ -32,7 +32,10 @@ namespace Rzonca_Babik_FixCar4Us.Pages.RepairStatus
 
             CustomerOrders = await _context.RepairOrders
                 .Include(r => r.Vehicle)
-                .Include(r => r.OrderServices) // żeby móc zsumować cenę
+                .Include(r => r.Employee)
+                .Include(r => r.OrderServices)
+                .ThenInclude(os => os.Service)
+                .Include(r => r.OrderParts)
                 .Where(r => r.Vehicle != null && r.Vehicle.CustomerId == customerId)
                 .OrderByDescending(r => r.Id)
                 .ToListAsync();

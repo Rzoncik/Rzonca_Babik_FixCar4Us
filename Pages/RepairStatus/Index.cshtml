@@ -51,15 +51,66 @@
                                 <strong>Opis:</strong><br />
                                 @order.ReportedIssues
                             </p>
+
+                            @if (order.Employee != null)
+                            {
+                                <div class="bg-primary bg-opacity-10 p-2 rounded mb-3 border border-primary border-opacity-25 shadow-sm">
+                                    <strong class="text-primary small d-block mb-1"><i class="bi bi-person-workspace me-1"></i> Opiekun zlecenia:</strong>
+                                    <div class="d-flex align-items-center mt-2">
+                                        <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3 d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;">
+                                            <i class="bi bi-person-fill fs-5 text-primary"></i>
+                                        </div>
+                                        <div class="small">
+                                            <div class="fw-bold text-dark fs-6">@order.Employee.FirstName @order.Employee.LastName</div>
+                                            <div class="text-muted mt-1"><i class="bi bi-telephone-fill me-1"></i> @order.Employee.PhoneNumber</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
                             
                             @{
-                                double total = order.OrderServices.Sum(s => s.FinalPrice ?? 0);
+                                double servicesTotal = order.OrderServices.Sum(s => s.FinalPrice ?? 0);
+                                double additionalFee = order.AdditionalFee;
+                                double partsCost = order.OrderParts.Sum(p => (p.Quantity ?? 0) * (p.PriceAtTheTime ?? 0));
+                                double laborCost = order.OrderServices.Sum(s => (s.LoggedHours ?? 0) * (s.Service?.BaseHourlyRate ?? 150.0));
+                                double total = servicesTotal;
+                            }
+                            
+                            @if (total > 0 || additionalFee > 0 || partsCost > 0 || laborCost > 0)
+                            {
+                                <div class="bg-light p-3 rounded-3 mb-3">
+                                    <span class="d-block text-dark fw-bold mb-2 border-bottom pb-2">Kosztorys:</span>
+                                    <ul class="list-unstyled mb-0 small">
+                                        <li class="d-flex justify-content-between mb-1">
+                                            <span>Robocizna (czas: @order.OrderServices.Sum(s => s.LoggedHours ?? 0)h):</span>
+                                            <strong>@laborCost.ToString("C")</strong>
+                                        </li>
+                                        <li class="d-flex justify-content-between mb-1">
+                                            <span>Części zamienne:</span>
+                                            <strong>@partsCost.ToString("C")</strong>
+                                        </li>
+                                        @if (additionalFee > 0)
+                                        {
+                                            <li class="d-flex justify-content-between mb-1 text-danger">
+                                                <span>Wycena dodatkowa (@order.DifficultyDescription):</span>
+                                                <strong>@additionalFee.ToString("C")</strong>
+                                            </li>
+                                        }
+                                        @if ((laborCost + partsCost + additionalFee) > total)
+                                        {
+                                            <li class="d-flex justify-content-between mb-1 text-success fw-bold">
+                                                <span>Rabat flotowy (15% od całości):</span>
+                                                <strong>-@((laborCost + partsCost + additionalFee - total).ToString("C"))</strong>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
                             }
                             
                             @if (total > 0)
                             {
-                                <div class="bg-light p-3 rounded-3 mb-3 text-center">
-                                    <span class="d-block text-muted small text-uppercase fw-bold">Suma do zapłaty</span>
+                                <div class="bg-primary bg-opacity-10 p-3 rounded-3 mb-3 text-center border border-primary">
+                                    <span class="d-block text-primary small text-uppercase fw-bold">Suma do zapłaty</span>
                                     <h4 class="mb-0 text-dark fw-bold">@total.ToString("C")</h4>
                                 </div>
                             }

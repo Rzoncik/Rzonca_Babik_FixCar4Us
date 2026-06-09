@@ -5,51 +5,39 @@
     ViewData["IsClientPage"] = true;
 }
 
-<div class="container text-center py-5">
+<section class="container text-center py-5">
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <section role="alert" style="background-color: red !important;">
             @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+        </section>
     }
 
-    <h1 class="display-3 fw-bold text-primary mb-4">FixCar4Us</h1>
-    <p class="lead mb-5">Profesjonalne usługi naprawy samochodów. Szybko, solidnie i w dobrej cenie.</p>
-    
-    <div class="row justify-content-center gap-4 mb-5">
-        <div class="col-md-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-body d-flex flex-column">
-                    <h3 class="card-title h5">Sprawdź status naprawy</h3>
-                    <p class="card-text text-muted flex-grow-1">Dowiedz się, na jakim etapie jest naprawa Twojego samochodu.</p>
-                    <a asp-page="/RepairStatus/Index" class="btn btn-primary mt-3">Sprawdź Status</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-body d-flex flex-column">
-                    <h3 class="card-title h5">Moje Pojazdy</h3>
-                    <p class="card-text text-muted flex-grow-1">Zarządzaj swoimi pojazdami i zgłaszaj ich naprawy.</p>
-                    <a asp-page="/MyVehicles/Index" class="btn btn-info mt-3 text-white">Przeglądaj</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-body d-flex flex-column">
-                    <h3 class="card-title h5">Umów wizytę</h3>
-                    <p class="card-text text-muted flex-grow-1">Zarezerwuj termin w naszym warsztacie szybko i wygodnie.</p>
-                    <a asp-page="/BookAppointment" class="btn btn-success mt-3">Umów</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="mt-5 d-flex justify-content-center gap-3">
-        <a asp-page="/CustomerLogin" class="btn btn-primary">Zaloguj jako Klient</a>
-        <a asp-page="/ClientLogin" class="btn btn-outline-primary">Zarejestruj jako Klient</a>
-        <a asp-page="/AdminLogin" class="btn btn-outline-secondary">Zaloguj jako pracownik (Admin)</a>
-    </div>
-</div>
+    <img src="../images/logo.png" alt="FixCar4Us" class="logo">
+    <h4 class="text-motto">Profesjonalne usługi naprawy samochodów. Super, fajnie i kapitalnie. Normalnie petarda</h4>
+    <br/>
+    <section class="main-section">
+        <a asp-page="/BookAppointment"><h3>Umów wizytę</h3></a>
+        <span>Zarezerwuj termin w naszym warsztacie szybko i wygodnie.</span>
+        <br/>
+        <br/>
+        <a asp-page="/MyVehicles/Index"><h3>Moje Pojazdy</h3></a>
+        <span>Zarządzaj swoimi pojazdami i zgłaszaj ich naprawy.</span>
+        <br/>
+        <br/>
+        <a asp-page="/RepairStatus/Index"><h3>Sprawdź status naprawy</h3></a>
+        <span>Dowiedz się, na jakim etapie jest naprawa Twojego samochodu.</span>
+        <br/>
+        <br/>
+        <a asp-page="/FleetBookAppointment"><h3>Umów wizytę flotową</h3></a>
+        <span>Zarezerwuj wizyty dla Swoich aut z obniżoną ceną</span>
+    </section>
+    <br/>
+    <section class="main-section">
+        <a asp-page="/CustomerLogin">Logowanie</a>
+        <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        <a asp-page="/ClientLogin">Rejestracja</a>
+        <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        <a asp-page="/AdminLogin">Panel Pracownika</a>
+    </section>
+</section>

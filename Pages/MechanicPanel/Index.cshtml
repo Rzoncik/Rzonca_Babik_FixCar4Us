@@ -32,6 +32,22 @@
                                 @(order.OrderServices?.FirstOrDefault()?.Service?.Name ?? "Nie określono")
                             </p>
 
+                            @if (order.Employee != null)
+                            {
+                                <div class="bg-light p-2 rounded mb-3 border border-secondary border-opacity-25 shadow-sm">
+                                    <strong class="text-primary small d-block mb-1"><i class="bi bi-tools me-1"></i> Przypisany Mechanik:</strong>
+                                    <div class="d-flex align-items-center mt-2">
+                                        <div class="bg-secondary bg-opacity-10 rounded-circle p-2 me-3 d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;">
+                                            <i class="bi bi-person-fill fs-5 text-secondary"></i>
+                                        </div>
+                                        <div class="small">
+                                            <div class="fw-bold text-dark fs-6">@order.Employee.FirstName @order.Employee.LastName</div>
+                                            <div class="text-muted mt-1"><i class="bi bi-telephone-fill me-1"></i> @order.Employee.PhoneNumber</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
                             @if (order.Status == "Oczekujące na termin" || order.Status == "Nowe")
                             {
                                 <form method="post" asp-page-handler="Schedule">
@@ -49,16 +65,22 @@
                                         </div>
                                     </div>
                                     <div class="row g-2 mb-4">
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <label class="form-label small fw-bold">Stanowisko pracy</label>
                                             <select asp-for="SelectedWorkstationId" asp-items='(SelectList)ViewData["WorkstationsList"]' class="form-select form-select-sm" required>
                                                 <option value="">-- Wybierz stanowisko --</option>
                                             </select>
                                         </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label small fw-bold">Wymagane narzędzie (Opcjonalnie)</label>
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold">Wymagane narzędzie</label>
                                             <select asp-for="SelectedToolId" asp-items='(SelectList)ViewData["ToolsList"]' class="form-select form-select-sm">
                                                 <option value="">-- Brak narzędzia --</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold">Mechanik (Wymagane)</label>
+                                            <select asp-for="SelectedEmployeeId" asp-items='(SelectList)ViewData["EmployeesList"]' class="form-select form-select-sm" required>
+                                                <option value="">-- Wybierz pracownika --</option>
                                             </select>
                                         </div>
                                     </div>
@@ -73,28 +95,83 @@
                                 <form method="post" asp-page-handler="AdvanceStage">
                                     <input type="hidden" name="SelectedOrderId" value="@order.Id" />
                                     
-                                    @if (order.Status == "W naprawie")
+                                    @if (order.Status == "Zamawianie części")
                                     {
                                         <div class="row g-2 mb-4 bg-light p-2 rounded">
                                             <div class="col-md-8">
-                                                <label class="form-label small fw-bold">Zużyta Część (opcjonalnie)</label>
+                                                <label class="form-label small fw-bold">Zamawiana Część (opcjonalnie)</label>
                                                 <select name="PartIdToConsume" asp-items="Model.PartsList" class="form-select form-select-sm">
-                                                    <option value="0">-- Brak (nie zużyto) --</option>
+                                                    <option value="-1">-- Brak (nie zamawiano) --</option>
                                                 </select>
                                             </div>
                                             <div class="col-md-4">
                                                 <label class="form-label small fw-bold">Ilość sztuk</label>
-                                                <input type="number" name="QuantityToConsume" class="form-control form-control-sm" value="0" />
+                                                <input type="number" name="QuantityToConsume" class="form-control form-control-sm" value="1" min="1" />
+                                            </div>
+                                            <div class="col-md-12 mt-2">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="IsReplacementPart_@order.Id" name="IsReplacementPart">
+                                                    <label class="form-check-label small fw-bold text-muted" for="IsReplacementPart_@order.Id">
+                                                        Część zamienna (zastosuj 50% rabatu na cenę katalogową)
+                                                    </label>
+                                                </div>
                                             </div>
                                         </div>
-                                    }
 
-                                    <div class="d-grid gap-2">
-                                        <button type="submit" class="btn btn-danger fw-bold">
-                                            Zatwierdź pracę (godziny obliczą się same)
-                                        </button>
-                                    </div>
+                                        <div class="d-grid gap-2">
+                                            <button type="submit" class="btn btn-primary fw-bold">
+                                                Zamów i przejdź do naprawy
+                                            </button>
+                                        </div>
+                                    }
+                                    else if (order.Status == "W naprawie")
+                                    {
+                                        <div class="d-grid gap-2">
+                                            <button type="submit" class="btn btn-warning fw-bold text-dark">
+                                                Zatwierdź pracę i przejdź do wyceny
+                                            </button>
+                                        </div>
+                                    }
+                                    else if (order.Status == "Wycena dodatkowa")
+                                    {
+                                        <div class="row g-2 mb-4 bg-light p-2 rounded">
+                                            <div class="col-md-12 mb-2">
+                                                <label class="form-label small fw-bold">Opis utrudnień (np. trudny dostęp, urwana śruba)</label>
+                                                <textarea name="DifficultyDescription" class="form-control form-control-sm" rows="2"></textarea>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <label class="form-label small fw-bold">Dodatkowa opłata (PLN)</label>
+                                                <input type="number" name="AdditionalFee" class="form-control form-control-sm" value="0" step="0.01" />
+                                            </div>
+                                        </div>
+
+                                        <div class="d-grid gap-2">
+                                            <button type="submit" class="btn btn-danger fw-bold">
+                                                Zakończ naprawę
+                                            </button>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="d-grid gap-2">
+                                            <button type="submit" class="btn btn-danger fw-bold">
+                                                Przejdź do kolejnego etapu
+                                            </button>
+                                        </div>
+                                    }
                                 </form>
+
+                                @if (order.Status != "Oczekujące na termin" && order.Status != "Przyjęte" && order.Status != "Zakończone" && order.Status != "Opłacone" && order.Status != "Zaplanowane")
+                                {
+                                    <form method="post" asp-page-handler="RollbackStage" class="mt-2">
+                                        <input type="hidden" name="SelectedOrderId" value="@order.Id" />
+                                        <div class="d-grid gap-2">
+                                            <button type="submit" class="btn btn-secondary fw-bold">
+                                                <i class="bi bi-arrow-left-circle me-1"></i> Cofnij do poprzedniego etapu
+                                            </button>
+                                        </div>
+                                    </form>
+                                }
                             }
                         </div>
                     </div>
@@ -110,5 +187,68 @@
                 </div>
             </div>
         }
+        }
+    </div>
+
+    <!-- Calendar Section -->
+    <div class="row mt-5 mb-5">
+        <div class="col-12">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-header bg-dark text-white p-3 rounded-top-4">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-calendar-week me-2"></i>Kalendarz Warsztatu</h4>
+                </div>
+                <div class="card-body p-4">
+                    <div id="mechanicCalendar"></div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+@section Scripts {
+    <!-- FullCalendar CSS and JS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/pl.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('mechanicCalendar');
+
+            // Formatowanie wydarzeń z danych przekazanych z backendu
+            var eventsData = [
+                @foreach (var ev in Model.CalendarEvents)
+                {
+                    <text>
+                    {
+                        title: '@Html.Raw(ev.Title)',
+                        start: '@ev.Start',
+                        end: '@ev.End',
+                        color: '@ev.Color'
+                    },
+                    </text>
+                }
+            ];
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                locale: 'pl',
+                initialView: 'timeGridWeek',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                slotMinTime: '07:00:00',
+                slotMaxTime: '19:00:00',
+                allDaySlot: false,
+                events: eventsData,
+                eventDidMount: function(info) {
+                    // Dodanie tooltipa z pełną nazwą
+                    info.el.setAttribute('title', info.event.title);
+                }
+            });
+
+            calendar.render();
+        });
+    </script>
+}

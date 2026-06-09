@@ -4,19 +4,6 @@
     ViewData["Title"] = "Moje Pojazdy";
     ViewData["IsClientPage"] = true;
 }
-
-<div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary fw-bold">Moje Pojazdy</h2>
-        <div>
-            @if (Model.IsFleet)
-            {
-                <a asp-page="/FleetBookAppointment" class="btn btn-warning me-2 fw-bold text-dark">Rezerwacja Grupowa (Flota)</a>
-            }
-            <a asp-page="./Create" class="btn btn-success">Dodaj nowy pojazd</a>
-        </div>
-    </div>
-
     @if (Model.Vehicles.Count == 0)
     {
         <div class="alert alert-info">
@@ -25,9 +12,6 @@
     }
     else
     {
-        <div class="card shadow-sm border-0 rounded-4">
-            <div class="card-body p-0">
-                <div class="table-responsive">
                     <table class="table table-hover mb-0">
                         <thead class="table-light">
                             <tr>
@@ -53,8 +37,5 @@
                             }
                         </tbody>
                     </table>
-                </div>
-            </div>
-        </div>
     }
 </div>

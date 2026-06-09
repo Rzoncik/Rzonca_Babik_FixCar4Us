@@ -1,45 +1,35 @@
 @page
 @model Rzonca_Babik_FixCar4Us.Pages.CustomerLoginModel
 @{
-    ViewData["Title"] = "Logowanie Klienta";
+    ViewData["Title"] = "Logowanie";
     ViewData["IsClientPage"] = true;
 }
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-5">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Zaloguj się do swojego konta</h4>
-                </div>
-                <div class="card-body p-4">
-                    <form method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-                        <div class="mb-3">
-                            <label asp-for="Input.Email" class="form-label"></label>
-                            <input asp-for="Input.Email" class="form-control" type="email" placeholder="jan.kowalski@email.com" />
-                            <span asp-validation-for="Input.Email" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Input.Password" class="form-label"></label>
-                            <input asp-for="Input.Password" class="form-control" placeholder="Hasło" />
-                            <span asp-validation-for="Input.Password" class="text-danger"></span>
-                        </div>
-
-                        <div class="d-grid mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg">Zaloguj się</button>
-                        </div>
-                    </form>
-                </div>
-                <div class="card-footer text-center">
-                    <small>Nie masz konta? <a asp-page="/ClientLogin">Zarejestruj się</a></small>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<section class="row justify-content-center">
+    <section class="form">
+        <h3>Logowanie</h3>
+        <form method="post">
+            <section asp-validation-summary="ModelOnly" class="text-danger mb-3"></section>
+            <label asp-for="Input.Email"></label>
+            <br/>
+            <input asp-for="Input.Email" type="email" />
+            <br/>
+            <span asp-validation-for="Input.Email" class="text-danger"></span>
+            <br/>
+            <label asp-for="Input.Password"></label>
+            <br/>
+            <input asp-for="Input.Password" />
+            <br/>
+            <span asp-validation-for="Input.Password" class="text-danger"></span>
+            <br/>
+            <button type="submit">Zaloguj się</button>
+        </form>
+        <br/>
+        <small>Nie masz konta? <a asp-page="/ClientLogin">Zarejestruj się</a></small>
+        <br/>
+        <a asp-page="/Index">Wróć na stronę główną</a>
+    </section>
+</section>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

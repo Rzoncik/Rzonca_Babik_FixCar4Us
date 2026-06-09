@@ -141,6 +141,30 @@ namespace Rzonca_Babik_FixCar4Us.Services
         }
     }
 
+    // Konkretny Dekorator dla niestandardowych opłat
+    public class CustomFeeDecorator : RepairCostDecorator
+    {
+        private readonly double _extraFee;
+        private readonly string _description;
+
+        public CustomFeeDecorator(IRepairCost repairCost, double extraFee, string description) 
+            : base(repairCost)
+        {
+            _extraFee = extraFee;
+            _description = description;
+        }
+
+        public override double GetTotalCost()
+        {
+            return base.GetTotalCost() + _extraFee;
+        }
+
+        public override string GetDescription()
+        {
+            return base.GetDescription() + $"\n + {_description} (+{_extraFee:C})";
+        }
+    }
+
     // Konkretny Dekorator 3: Szybki termin ("Express") - doliczenie 20% do całości
     public class ExpressServiceDecorator : RepairCostDecorator
     {

@@ -19,7 +19,6 @@ namespace Rzonca_Babik_FixCar4Us.Pages.MyVehicles
         }
 
         public IList<Vehicle> Vehicles { get; set; } = default!;
-        public bool IsFleet { get; set; } = false;
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -28,12 +27,7 @@ namespace Rzonca_Babik_FixCar4Us.Pages.MyVehicles
                 TempData["SuccessMessage"] = "Musisz być zalogowany, aby przeglądać swoje pojazdy.";
                 return RedirectToPage("/CustomerLogin");
             }
-
             var customer = await _context.Customers.FindAsync(customerId);
-            if (customer != null && customer.IsFleet == 1)
-            {
-                IsFleet = true;
-            }
 
             Vehicles = await _context.Vehicles
                 .Where(v => v.CustomerId == customerId)

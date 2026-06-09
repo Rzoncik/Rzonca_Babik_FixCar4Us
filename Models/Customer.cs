@@ -15,8 +15,6 @@ public partial class Customer
 
     public string? Email { get; set; }
 
-    public int? IsFleet { get; set; }
-
     public double? DiscountRatePercent { get; set; }
 
     public string? PasswordHash { get; set; }

@@ -4,7 +4,7 @@
     ViewData["Title"] = "Dodaj Klienta";
 }
 
-<div class="border rounded p-4 bg-white shadow-sm mt-4" style="max-width: 600px; margin: 0 auto;">
+<div class="border rounded p-4  shadow-sm mt-4" style="max-width: 600px; margin: 0 auto;">
     <h2 class="mb-4">Dodaj nowego klienta</h2>
 
     <form method="post">
@@ -30,14 +30,6 @@
             <label asp-for="Customer.Email" class="form-label">Email</label>
             <input asp-for="Customer.Email" class="form-control" type="email" placeholder="email@przyklad.pl" />
             <span asp-validation-for="Customer.Email" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="Customer.IsFleet" class="form-label">Typ klienta</label>
-            <select asp-for="Customer.IsFleet" class="form-select">
-                <option value="0">Osoba prywatna</option>
-                <option value="1">Flota (Firma)</option>
-            </select>
         </div>
 
         <div class="mb-3">
