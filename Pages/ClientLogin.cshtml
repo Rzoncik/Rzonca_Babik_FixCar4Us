@@ -5,8 +5,8 @@
     ViewData["IsClientPage"] = true;
 }
 
-<div class="row justify-content-center">
-    <div class="form">
+<section class="row justify-content-center">
+    <section class="form">
         <h3>Rejestracja</h3>
         <form method="post">
             <label asp-for="Input.FirstName"></label>
@@ -45,9 +45,10 @@
         <br/>
         <small>Masz już konto? <a asp-page="/CustomerLogin">Zaloguj się</a></small>
         <br/>
+        <br/>
         <a asp-page="/Index">Wróć na stronę główną</a>
-    </div>
-</div>
+    </section>
+</section>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

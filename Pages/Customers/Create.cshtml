@@ -4,46 +4,42 @@
     ViewData["Title"] = "Dodaj Klienta";
 }
 
-<div class="border rounded p-4  shadow-sm mt-4" style="max-width: 600px; margin: 0 auto;">
-    <h2 class="mb-4">Dodaj nowego klienta</h2>
+<section class="row justify-content-center">
+    <section class="form">
+        <h3>Dodaj nowego klienta</h3>
+        </br/>
 
-    <form method="post">
-        <div class="mb-3">
-            <label asp-for="Customer.FirstName" class="form-label">Imię / Nazwa Firmy</label>
-            <input asp-for="Customer.FirstName" class="form-control" placeholder="np. Jan / Auto-Pol Sp. z o.o." />
-            <span asp-validation-for="Customer.FirstName" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="Customer.LastName" class="form-label">Nazwisko</label>
-            <input asp-for="Customer.LastName" class="form-control" placeholder="(Zostaw puste dla firmy)" />
-            <span asp-validation-for="Customer.LastName" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="Customer.PhoneNumber" class="form-label">Telefon (np. 123456789)</label>
-            <input asp-for="Customer.PhoneNumber" class="form-control" type="number" />
-            <span asp-validation-for="Customer.PhoneNumber" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="Customer.Email" class="form-label">Email</label>
-            <input asp-for="Customer.Email" class="form-control" type="email" placeholder="email@przyklad.pl" />
-            <span asp-validation-for="Customer.Email" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="Customer.DiscountRatePercent" class="form-label">Rabat domyślny (%)</label>
-            <input asp-for="Customer.DiscountRatePercent" class="form-control" type="number" step="0.1" placeholder="0" value="0" />
-            <span asp-validation-for="Customer.DiscountRatePercent" class="text-danger"></span>
-        </div>
-
-        <div class="d-flex justify-content-between mt-4">
-            <a href="/Customers" class="btn btn-secondary">Anuluj</a>
-            <button type="submit" class="btn btn-primary">Zapisz klienta</button>
-        </div>
-    </form>
-</div>
+        <form method="post">
+            <section>
+                <label asp-for="Customer.FirstName">Imię / Nazwa Firmy</label>
+                <input asp-for="Customer.FirstName" placeholder="np. Jan / Auto-Pol Sp. z o.o." />
+                <span asp-validation-for="Customer.FirstName"></span>
+            </section>
+            </br>
+            <section>
+                <label asp-for="Customer.LastName">Nazwisko</label>
+                <input asp-for="Customer.LastName" placeholder="(Zostaw puste dla firmy)" />
+                <span asp-validation-for="Customer.LastName"></span>
+            </section>
+            </br>
+            <section>
+                <label asp-for="Customer.PhoneNumber">Telefon (np. 123456789)</label>
+                <input asp-for="Customer.PhoneNumber" type="number" />
+                <span asp-validation-for="Customer.PhoneNumber" class="text-danger"></span>
+            </section>
+            </br>
+            <section>
+                <label asp-for="Customer.Email">Email</label>
+                <input asp-for="Customer.Email" type="email" placeholder="email@przyklad.pl" />
+                <span asp-validation-for="Customer.Email"></span>
+            </section>
+            </br>
+            <section>
+                <button type="submit">Zapisz klienta</button>
+            </section>
+        </form>
+    </section>
+</section>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

@@ -1,54 +1,40 @@
 @page
 @model Rzonca_Babik_FixCar4Us.Pages.Catalog.IndexModel
 @{
-    ViewData["Title"] = "Katalog części i usług";
+    ViewData["Title"] = "Katalog usług";
 }
 
-<div class="container mt-4">
-    <h1 class="mb-4 text-center">Katalog części i usług</h1>
-
-    <div class="row">
-        <!-- Cennik Usług -->
-        <div class="col-md-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                    <h3 class="card-title mb-0">Cennik roboczogodzin</h3>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-striped mb-0 text-center">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nazwa usługi (Kategoria)</th>
-                                    <th>Stawka za roboczogodzinę</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (Model.Services != null && Model.Services.Any())
-                                {
-                                    @foreach (var service in Model.Services)
-                                    {
-                                        <tr>
-                                            <td>@service.Id</td>
-                                            <td>@service.Name</td>
-                                            <td>
-                                                <span class="fw-bold text-success">@service.BaseHourlyRate zł/h</span>
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                                else
-                                {
-                                    <tr>
-                                        <td colspan="3" class="text-muted py-3">Brak usług w bazie danych.</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<section class="row justify-content-center">
+    <section class="form form-wide">
+        <h3>Katalog usług</h3>
+        <br/>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nazwa usługi (Kategoria)</th>
+                    <th>Stawka za roboczogodzinę</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Services != null && Model.Services.Any())
+                {
+                    @foreach (var service in Model.Services)
+                    {
+                        <tr>
+                            <td>@service.Name</td>
+                            <td>
+                                <span>@service.BaseHourlyRate zł/h</span>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3">Brak usług w bazie danych.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </section>
+</section>

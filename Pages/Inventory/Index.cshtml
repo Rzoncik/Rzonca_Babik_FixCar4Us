@@ -1,70 +1,102 @@
 @page
 @model Rzonca_Babik_FixCar4Us.Pages.Inventory.IndexModel
 @{
-    ViewData["Title"] = "Zarządzanie magazynem";
+    ViewData["Title"] = "Magazyn części";
 }
 
-<div class="container mt-4">
-    <h1 class="mb-4 text-center">Zarządzanie magazynem</h1>
-    <p class="text-muted text-center mb-4">Rejestrowanie przychodów i rozchodów części. Wpisz wartość dodatnią aby dodać części do magazynu, lub ujemną aby je wydać (np. -2).</p>
+<section class="row justify-content-center">
+    <section class="form form-wide">
+        <h3>Magazyn części</h3>
+        <br/>
+        <a asp-page="./Create">Dodaj nową część</a>
+        <br/>
+        <br/>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
-            <h3 class="card-title mb-0">Stan magazynowy części</h3>
-            <a asp-page="./Create" class="btn btn-sm btn-dark">Dodaj nową część</a>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover table-striped mb-0 align-middle text-center">
-                    <thead class="table-light">
+        <form method="get">
+            <input type="text" asp-for="SearchString" placeholder="Szukaj po nazwie części lub numerze seryjnym"/>
+            <br/>
+            <br/>
+            <button type="submit">Szukaj</button>
+            <br/>
+            <br/>
+            @if (!string.IsNullOrEmpty(Model.SearchString))
+            {
+                <a asp-page="./Index">Wyczyść filtry</a>
+                <br/>
+                <br/>
+            }
+        </form>
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <section class="alert">
+                <span>@TempData["ErrorMessage"]</span>
+            </section>
+            <br/>
+        }
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <section class="alert">
+                <span>@TempData["SuccessMessage"]</span>
+            </section>
+            <br/>
+        }
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nazwa części</th>
+                    <th>Numer seryjny</th>
+                    <th>Stan na magazynie</th>
+                    <th>Dodaj część wpisując liczbę<br/>(Ujemna wartość usuwa część)</th>
+                    <th>Akcje</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Parts != null && Model.Parts.Any())
+                {
+                    @foreach (var part in Model.Parts)
+                    {
                         <tr>
-                            <th>ID</th>
-                            <th>Nazwa</th>
-                            <th>Numer seryjny</th>
-                            <th>Stan na magazynie</th>
-                            <th>Operacje magazynowe (Przychód / Rozchód)</th>
+                            <td>@part.Id</td>
+                            <td>@part.Name</td>
+                            <td>@part.PartNumber</td>
+                            <td>
+                                @if (part.StockQuantity > 0)
+                                {
+                                    <span>@part.StockQuantity szt.</span>
+                                }
+                                else
+                                {
+                                    <span>Brak</span>
+                                }
+                            </td>
+                            <td>
+                                <form method="post" asp-page-handler="UpdateStock">
+                                    <input type="hidden" name="PartId" value="@part.Id" />
+                                    <section style="display: flex; gap: 0.5rem;">
+                                        <input type="number" name="QuantityChange" required />
+                                        <button type="submit">Aktualizuj</button>
+                                    </section>
+                                </form>
+                            </td>
+                            <td>
+                                <form method="post" asp-page-handler="Delete">
+                                    <input type="hidden" name="partId" value="@part.Id" />
+                                    <button type="submit" onclick="return confirm('Czy na pewno chcesz usunąć tę część?');">Usuń</button>
+                                </form>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.Parts != null && Model.Parts.Any())
-                        {
-                            @foreach (var part in Model.Parts)
-                            {
-                                <tr>
-                                    <td>@part.Id</td>
-                                    <td>@part.Name</td>
-                                    <td>@part.PartNumber</td>
-                                    <td>
-                                        @if (part.StockQuantity > 0)
-                                        {
-                                            <span class="badge bg-success fs-6">@part.StockQuantity szt.</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-danger fs-6">Brak</span>
-                                        }
-                                    </td>
-                                    <td>
-                                        <form method="post" asp-page-handler="UpdateStock" class="d-flex justify-content-center m-0">
-                                            <input type="hidden" name="PartId" value="@part.Id" />
-                                            <div class="input-group input-group-sm" style="max-width: 250px;">
-                                                <input type="number" name="QuantityChange" class="form-control" placeholder="Ilość (np. 5 lub -2)" required />
-                                                <button type="submit" class="btn btn-outline-dark">Aktualizuj</button>
-                                            </div>
-                                        </form>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="5" class="text-muted py-3">Brak części w bazie danych.</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6">Brak części w bazie danych.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <br/>
+        <a asp-page="/Index">Wróć na stronę główną</a>
+    </section>
+</section>

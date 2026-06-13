@@ -4,38 +4,49 @@
     ViewData["Title"] = "Moje Pojazdy";
     ViewData["IsClientPage"] = true;
 }
-    @if (Model.Vehicles.Count == 0)
-    {
-        <div class="alert alert-info">
-            Nie masz jeszcze żadnych dodanych pojazdów. Kliknij przycisk "Dodaj nowy pojazd", aby zacząć.
-        </div>
-    }
-    else
-    {
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Marka i model</th>
-                                <th>Nr rejestracyjny</th>
-                                <th>VIN</th>
-                                <th>Przebieg (km)</th>
-                                <th class="text-end">Akcje</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in Model.Vehicles)
-                            {
-                                <tr>
-                                    <td class="align-middle fw-bold">@item.Model</td>
-                                    <td class="align-middle"><span class="badge bg-secondary">@item.LicensePlate</span></td>
-                                    <td class="align-middle text-muted">@(string.IsNullOrEmpty(item.VIN) ? "-" : item.VIN)</td>
-                                    <td class="align-middle">@item.Mileage</td>
-                                    <td class="text-end align-middle">
-                                        <a asp-page="/BookAppointment" asp-route-vehicleId="@item.Id" class="btn btn-sm btn-primary">Zgłoś naprawę</a>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-    }
-</div>
+
+@if (Model.Vehicles.Count == 0)
+{
+    <section class="alert alert-info">
+        Nie masz jeszcze żadnych dodanych pojazdów. Kliknij przycisk "Dodaj nowy pojazd", aby zacząć.
+    </section>
+}
+else
+{
+    <section class="row justify-content-center">
+        <section class="form">
+            <h3>Moje pojazdy</h3>
+            <br/>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Marka i model</th>
+                        <th>Nr rejestracyjny</th>
+                        <th>VIN</th>
+                        <th>Przebieg (km)</th>
+                        <th>Akcje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Vehicles)
+                    {
+                        <tr>
+                            <td>@item.Model</td>
+                            <td>@item.LicensePlate</td>
+                            <td>@(string.IsNullOrEmpty(item.VIN) ? "-" : item.VIN)</td>
+                            <td>@item.Mileage</td>
+                            <td>
+                                <a asp-page="/BookAppointment" asp-route-vehicleId="@item.Id">Zgłoś naprawę</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <br/>
+            <a asp-page="/MyVehicles/Create">Dodaj nowy pojazd</a>
+            <br/>
+            <br/>
+            <a asp-page="/Index">Wróć na stronę główną</a>
+        </section>
+    </section>
+}

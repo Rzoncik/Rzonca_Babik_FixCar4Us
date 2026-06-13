@@ -27,12 +27,26 @@ namespace Rzonca_Babik_FixCar4Us.Pages.Inventory
         [BindProperty]
         public int QuantityChange { get; set; }
 
+        [BindProperty(SupportsGet = true)]
+        public string? SearchString { get; set; }
+
         public async Task OnGetAsync()
         {
             // Pobranie aktualnego stanu magazynowego wszystkich części
             if (_context.Parts != null)
             {
-                Parts = await _context.Parts.ToListAsync();
+                var query = _context.Parts.AsQueryable();
+
+                if (!string.IsNullOrEmpty(SearchString))
+                {
+                    var lowerSearch = SearchString.ToLower();
+                    query = query.Where(p => 
+                        (p.Name != null && p.Name.ToLower().Contains(lowerSearch)) ||
+                        (p.PartNumber != null && p.PartNumber.ToLower().Contains(lowerSearch))
+                    );
+                }
+
+                Parts = await query.ToListAsync();
             }
         }
 
@@ -56,6 +70,35 @@ namespace Rzonca_Babik_FixCar4Us.Pages.Inventory
             }
 
             // Przeładowanie strony aby zobaczyć zmienione dane
+            return RedirectToPage("./Index");
+        }
+
+        public async Task<IActionResult> OnPostDeleteAsync(int partId)
+        {
+            var part = await _context.Parts
+                .Include(p => p.OrderParts)
+                .FirstOrDefaultAsync(p => p.Id == partId);
+                
+            if (part != null)
+            {
+                if ((part.StockQuantity ?? 0) == 0)
+                {
+                    if (part.OrderParts != null && part.OrderParts.Any())
+                    {
+                        TempData["ErrorMessage"] = "Nie można usunąć części, ponieważ widnieje w historii zleceń (jest używana w systemie).";
+                    }
+                    else
+                    {
+                        _context.Parts.Remove(part);
+                        await _context.SaveChangesAsync();
+                        TempData["SuccessMessage"] = $"Część '{part.Name}' została usunięta ze słownika.";
+                    }
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Nie można usunąć części. Stan magazynowy musi wynosić 0.";
+                }
+            }
             return RedirectToPage("./Index");
         }
     }

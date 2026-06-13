@@ -4,40 +4,42 @@
     ViewData["Title"] = "Dodaj Pojazd";
 }
 
-<div class="border rounded p-4  shadow-sm mt-4" style="max-width: 600px; margin: 0 auto;">
-    <h2 class="mb-4">Dodaj nowy pojazd</h2>
-
-    <form method="post">
-        <div class="mb-3">
-            <label asp-for="Vehicle.LicensePlate" class="form-label">Numer Rejestracyjny</label>
-            <input asp-for="Vehicle.LicensePlate" class="form-control" placeholder="np. KR 12345" />
+<section class="row justify-content-center">
+    <section class="form">
+        <h3>Dodaj nowy pojazd</h3>
+        <br/>
+        <form method="post">
+            <label asp-for="Vehicle.LicensePlate">Numer Rejestracyjny</label>
+            <input asp-for="Vehicle.LicensePlate" placeholder="np. KR 12345" />
             <span asp-validation-for="Vehicle.LicensePlate" class="text-danger"></span>
-        </div>
+            <br/>
+            <br/>
 
-        <div class="mb-3">
-            <label asp-for="Vehicle.VIN" class="form-label">VIN</label>
-            <input asp-for="Vehicle.VIN" class="form-control" placeholder="17 znaków" />
+            <label asp-for="Vehicle.VIN">VIN</label>
+            <input asp-for="Vehicle.VIN" placeholder="17 znaków" />
             <span asp-validation-for="Vehicle.VIN" class="text-danger"></span>
-        </div>
+            <br/>
+            <br/>
 
-        <div class="mb-3">
-            <label asp-for="Vehicle.Model" class="form-label">Model pojazdu</label>
-            <input asp-for="Vehicle.Model" class="form-control" placeholder="np. Toyota Corolla" />
+            <label asp-for="Vehicle.Model">Model pojazdu</label>
+            <input asp-for="Vehicle.Model" placeholder="np. Toyota Corolla" />
             <span asp-validation-for="Vehicle.Model" class="text-danger"></span>
-        </div>
+            <br/>
+            <br/>
 
-        <div class="mb-3">
-            <label asp-for="Vehicle.Mileage" class="form-label">Przebieg (km)</label>
-            <input asp-for="Vehicle.Mileage" class="form-control" type="number" placeholder="np. 150000" />
+            <label asp-for="Vehicle.Mileage">Przebieg (km)</label>
+            <input asp-for="Vehicle.Mileage" type="number" placeholder="np. 150000" />
             <span asp-validation-for="Vehicle.Mileage" class="text-danger"></span>
-        </div>
+            <br/>
+            <br/>
 
-        <div class="d-flex justify-content-between mt-4">
-            <a href="/Vehicles" class="btn btn-secondary">Anuluj</a>
-            <button type="submit" class="btn btn-primary">Zapisz pojazd</button>
-        </div>
-    </form>
-</div>
+            <button type="submit">Zapisz pojazd</button>
+            <br/>
+            <br/>
+            <a href="/Vehicles/Vehicles">Powrót do bazy pojazdów </a>
+        </form>
+    </section>
+</section>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

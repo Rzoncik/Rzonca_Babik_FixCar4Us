@@ -18,9 +18,7 @@
             <br/>
             @if (Model.PreSelectedVehicle != null)
             {
-                <section class="alert alert-info">
-                    <strong>Umawiasz:</strong> @Model.PreSelectedVehicle.Model <span>@Model.PreSelectedVehicle.LicensePlate</span>
-                </section>
+                <h3><strong>Umawiasz:</strong> @Model.PreSelectedVehicle.Model @Model.PreSelectedVehicle.LicensePlate</h3>
                 <input type="hidden" asp-for="SelectedVehicleId" />
             }
             else if (Model.Vehicles.Count == 0)

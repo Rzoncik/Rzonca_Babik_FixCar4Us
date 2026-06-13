@@ -20,6 +20,9 @@ namespace Rzonca_Babik_FixCar4Us.Pages.RepairStatus
 
         public IList<RepairOrder> CustomerOrders { get; set; } = default!;
 
+        [BindProperty(SupportsGet = true)]
+        public string? SearchString { get; set; }
+
         public bool IsSuccess { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
@@ -30,15 +33,29 @@ namespace Rzonca_Babik_FixCar4Us.Pages.RepairStatus
                 return RedirectToPage("/CustomerLogin");
             }
 
-            CustomerOrders = await _context.RepairOrders
+            var query = _context.RepairOrders
                 .Include(r => r.Vehicle)
                 .Include(r => r.Employee)
                 .Include(r => r.OrderServices)
                 .ThenInclude(os => os.Service)
                 .Include(r => r.OrderParts)
-                .Where(r => r.Vehicle != null && r.Vehicle.CustomerId == customerId)
-                .OrderByDescending(r => r.Id)
-                .ToListAsync();
+                .Where(r => r.Vehicle != null && r.Vehicle.CustomerId == customerId);
+
+            if (!string.IsNullOrEmpty(SearchString))
+            {
+                var lowerSearch = SearchString.ToLower();
+                var searchNumberString = SearchString.Replace("#", "").Trim();
+                bool isNumeric = int.TryParse(searchNumberString, out int searchId);
+
+                query = query.Where(r => 
+                    (isNumeric && r.Id == searchId) ||
+                    (r.Status != null && r.Status.ToLower().Contains(lowerSearch)) ||
+                    (r.Vehicle != null && ((r.Vehicle.Model != null && r.Vehicle.Model.ToLower().Contains(lowerSearch)) || (r.Vehicle.LicensePlate != null && r.Vehicle.LicensePlate.ToLower().Contains(lowerSearch)))) ||
+                    (r.ReportedIssues != null && r.ReportedIssues.ToLower().Contains(lowerSearch))
+                );
+            }
+
+            CustomerOrders = await query.OrderByDescending(r => r.Id).ToListAsync();
 
             return Page();
         }

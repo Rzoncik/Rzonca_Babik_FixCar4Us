@@ -4,108 +4,84 @@
     ViewData["Title"] = "Historia Zleceń";
 }
 
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
-        <h2 class="text-primary fw-bold"><i class="bi bi-clock-history me-2"></i>Historia zakończonych napraw</h2>
-        <span class="badge bg-secondary fs-6">W historii: @Model.CompletedOrders.Count</span>
-    </div>
-
-    @if (Model.CompletedOrders.Count == 0)
-    {
-        <div class="alert alert-info text-center p-5 shadow-sm rounded-4">
-            <h4 class="alert-heading mb-3">Brak zleceń w historii</h4>
-            <p class="mb-0">Historia napraw jest pusta. Kiedy zlecenia zmienią status na "Zakończone" lub "Opłacone", pojawią się tutaj.</p>
-        </div>
-    }
-    else
-    {
-        <div class="card shadow border-0 rounded-4">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-dark">
-                            <tr>
-                                <th class="ps-4">ID Zlecenia</th>
-                                <th>Klient</th>
-                                <th>Pojazd (Nr rej.)</th>
-                                <th>Data przyjęcia</th>
-                                <th>Data zakończenia</th>
-                                <th>Status</th>
-                                <th>Mechanik</th>
-                                <th class="pe-4 text-end">Zgłoszone uwagi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var order in Model.CompletedOrders)
-                            {
-                                <tr>
-                                    <td class="ps-4 fw-bold">#@order.Id</td>
-                                    <td>
-                                        @if (order.Vehicle?.Customer != null)
-                                        {
-                                            @order.Vehicle.Customer.FirstName @order.Vehicle.Customer.LastName
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">Brak danych</span>
-                                        }
-                                        
-                                        @if (order.IsFleet == 1)
-                                        {
-                                            <span class="badge bg-warning text-dark ms-1">Flota</span>
-                                        }
-                                    </td>
-                                    <td>
-                                        @if (order.Vehicle != null)
-                                        {
-                                            <strong>@order.Vehicle.Model</strong><br />
-                                            <span class="badge bg-secondary">@order.Vehicle.LicensePlate</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">Brak przypisanego pojazdu</span>
-                                        }
-                                    </td>
-                                    <td>@order.CreatedAt</td>
-                                    <td class="fw-bold text-success">@order.CompletedAt</td>
-                                    <td>
-                                        <span class="badge @(order.Status == "Opłacone" ? "bg-secondary" : "bg-success") px-3 py-2">
-                                            <i class="bi @(order.Status == "Opłacone" ? "bi-check2-all" : "bi-check-circle") me-1"></i>@order.Status
-                                        </span>
-                                    </td>
-                                    <td>
-                                        @if (order.Employee != null)
-                                        {
-                                            <div><strong>@order.Employee.FirstName @order.Employee.LastName</strong></div>
-                                            <div class="small text-muted"><i class="bi bi-telephone"></i> @order.Employee.PhoneNumber</div>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted small">Brak</span>
-                                        }
-                                    </td>
-                                    <td>
-                                        @if (order.Employee != null)
-                                        {
-                                            <div><strong>@order.Employee.FirstName @order.Employee.LastName</strong></div>
-                                            <div class="small text-muted"><i class="bi bi-telephone"></i> @order.Employee.PhoneNumber</div>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted small">Brak</span>
-                                        }
-                                    </td>
-                                    <td class="pe-4 text-end text-muted small">
-                                        <div style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block;" title="@order.ReportedIssues">
-                                            @order.ReportedIssues
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+<section class="row justify-content-center">
+    <section class="form form-wide">
+        <h3>Historia zleceń</h3>
+        <br/>
+        @if (Model.CompletedOrders.Count == 0)
+        {
+            <div>
+                <h4>Brak zleceń w historii</h4>
+                <p>Historia napraw jest pusta. Kiedy zlecenia zmienią status na "Zakończone" lub "Opłacone", pojawią się tutaj.</p>
             </div>
-        </div>
-    }
-</div>
+        }
+        else
+        {
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Klient</th>
+                        <th>Pojazd (Nr rej.)</th>
+                        <th>Data przyjęcia</th>
+                        <th>Data zakończenia</th>
+                        <th>Status</th>
+                        <th>Mechanik</th>
+                        <th>Zgłoszone uwagi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model.CompletedOrders)
+                    {
+                        <tr>
+                            <td>#@order.Id</td>
+                            <td>
+                                @if (order.Vehicle?.Customer != null)
+                                {
+                                    <span>@order.Vehicle.Customer.FirstName @order.Vehicle.Customer.LastName</span>
+                                }
+                                else
+                                {
+                                    <span>Brak danych</span>
+                                }
+                                
+                                @if (order.IsFleet == 1)
+                                {
+                                    <span>Flota</span>
+                                }
+                            </td>
+                            <td>
+                                @if (order.Vehicle != null)
+                                {
+                                    <strong>@order.Vehicle.Model</strong><br />
+                                    <span>@order.Vehicle.LicensePlate</span>
+                                }
+                                else
+                                {
+                                    <span>Brak przypisanego pojazdu</span>
+                                }
+                            </td>
+                            <td>@order.CreatedAt</td>
+                            <td>@order.CompletedAt</td>
+                            <td>
+                                <span>@order.Status</span>
+                            </td>
+                            <td>
+                                @if (order.Employee != null)
+                                {
+                                    <div><strong>@order.Employee.FirstName @order.Employee.LastName</strong></div>
+                                    <div>@order.Employee.PhoneNumber</div>
+                                }
+                                else
+                                {
+                                    <span>Brak</span>
+                                }
+                            </td>
+                            <td>@order.ReportedIssues</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </section>
+</section>

@@ -1,5 +1,6 @@
 html {
   font-size: 1rem;
+  background-color: black;
   background-image: url(../images/background.webp);
   background-size: 100%;
   background-repeat: repeat-y;
@@ -57,6 +58,14 @@ li {
   margin-right: 1rem;
 }
 
+.wide {
+  width: 100%;
+}
+
+.form-wide {
+  width: 100% !important;
+}
+
 .form {
   width: fit-content;
   background-color: rgba(0, 0, 0, 0.5);
@@ -71,6 +80,7 @@ li {
 
 table {
   width: 100%;
+  text-align: center;
   border-collapse: separate;
   border-spacing: 0;
   border: 1px solid white;
@@ -87,7 +97,9 @@ table {
 }
 
 select,
-textarea {
+textarea,
+input:not([type="radio"]):not([type="checkbox"]),
+button {
   background-color: transparent;
   color: white;
   border-radius: 10px;
