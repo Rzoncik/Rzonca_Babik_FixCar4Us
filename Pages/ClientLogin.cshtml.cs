@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Rzonca_Babik_FixCar4Us.Models;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Rzonca_Babik_FixCar4Us.Data;
+using Rzonca_Babik_FixCar4Us.Models;
 
 namespace Rzonca_Babik_FixCar4Us.Pages
 {
@@ -31,12 +31,12 @@ namespace Rzonca_Babik_FixCar4Us.Pages
                 return Page();
             }
 
-            // Proste hashowanie SHA256 (poziom drugiego roku studiów)
+            // Hashowanie hasła SHA256
             using var sha256 = SHA256.Create();
             var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(Input.Password));
             var hash = BitConverter.ToString(hashedBytes).Replace("-", "").ToLowerInvariant();
 
-            // Generujemy nowe ID dla klienta (lub używamy autoinkrementacji, jeśli jest ustawiona)
+            // Generowanie nowego ID dla klienta
             int newId = _context.Customers.Any() ? _context.Customers.Max(c => c.Id) + 1 : 1;
 
             var newCustomer = new Customer
@@ -52,7 +52,6 @@ namespace Rzonca_Babik_FixCar4Us.Pages
             _context.Customers.Add(newCustomer);
             _context.SaveChanges();
 
-            // Przekierowanie po udanej rejestracji (na stronę główną)
             return RedirectToPage("/Index");
         }
 

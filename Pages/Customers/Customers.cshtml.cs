@@ -1,9 +1,9 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Rzonca_Babik_FixCar4Us.Data;
 using Rzonca_Babik_FixCar4Us.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Rzonca_Babik_FixCar4Us.Pages;
 
@@ -20,7 +20,7 @@ public class CustomersModel : PageModel
 
     public async Task OnGetAsync()
     {
-        // Pobieramy klientów i od razu ich pojazdy (Include)
+        // Pobieranie klientów i pojazdów z bazy
         Customers = await _context.Customers
             .Include(c => c.Vehicles)
             .ToListAsync();

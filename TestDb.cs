@@ -12,7 +12,7 @@ public class TestDb
         var services = new ServiceCollection();
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlite("Data Source=database.db"));
-        
+
         var provider = services.BuildServiceProvider();
         using var scope = provider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -25,7 +25,7 @@ public class TestDb
             context.Parts.Update(part);
             context.SaveChanges();
             Console.WriteLine($"Zapisano. StockQuantity powinno byc mniejsze o 1.");
-            
+
             var partAfter = context.Parts.AsNoTracking().FirstOrDefault(p => p.Id == part.Id);
             Console.WriteLine($"Po: Part {partAfter.Id} - {partAfter.Name}, StockQuantity: {partAfter.StockQuantity}");
         }

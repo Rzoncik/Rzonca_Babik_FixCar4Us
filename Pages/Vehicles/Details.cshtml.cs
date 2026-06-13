@@ -1,11 +1,11 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Rzonca_Babik_FixCar4Us.Data;
 using Rzonca_Babik_FixCar4Us.Models;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Rzonca_Babik_FixCar4Us.Pages.Vehicles
 {
@@ -19,10 +19,10 @@ namespace Rzonca_Babik_FixCar4Us.Pages.Vehicles
         }
 
         public Vehicle Vehicle { get; set; } = default!;
-        
-        // Zlecenia napraw powiązane z tym pojazdem
+
+        // Zlecenia napraw powiązane z danym pojazdem
         public IList<RepairOrder> RepairOrders { get; set; } = new List<RepairOrder>();
-        
+
         // Historia badań technicznych pojazdu
         public IList<TechnicalInspection> TechnicalInspections { get; set; } = new List<TechnicalInspection>();
 
@@ -33,24 +33,24 @@ namespace Rzonca_Babik_FixCar4Us.Pages.Vehicles
                 return NotFound();
             }
 
-            // Pobieramy dane wybranego pojazdu
+            // Pobieranie danych wybranego pojazdu
             var vehicle = await _context.Vehicles.FirstOrDefaultAsync(m => m.Id == id);
 
             if (vehicle == null)
             {
                 return NotFound();
             }
-            
+
             Vehicle = vehicle;
 
-            // Pobranie zleceń napraw wraz z pod-tabelą wymienionych części (Include/ThenInclude)
+            // Pobranie zleceń napraw z tabela wymienionych czesci
             if (_context.RepairOrders != null)
             {
                 RepairOrders = await _context.RepairOrders
                     .Include(r => r.OrderParts)
                     .ThenInclude(op => op.Part)
                     .Where(r => r.VehicleId == id)
-                    .OrderByDescending(r => r.CreatedAt) // Od najnowszych napraw
+                    .OrderByDescending(r => r.CreatedAt)
                     .ToListAsync();
             }
 
@@ -59,7 +59,7 @@ namespace Rzonca_Babik_FixCar4Us.Pages.Vehicles
             {
                 TechnicalInspections = await _context.TechnicalInspections
                     .Where(t => t.VehicleId == id)
-                    .OrderByDescending(t => t.InspectionDate) // Od najnowszych badań
+                    .OrderByDescending(t => t.InspectionDate)
                     .ToListAsync();
             }
 

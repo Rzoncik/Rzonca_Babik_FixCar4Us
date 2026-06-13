@@ -74,7 +74,7 @@ namespace Rzonca_Babik_FixCar4Us.Pages.MechanicPanel
                 .FirstOrDefaultAsync(r => r.Id == SelectedOrderId);
             if (order == null) return RedirectToPage();
 
-            // Używamy wzorca State, by ustalić prawidłowy następny status
+            // Wzorzec state zeby ustalić prawidłowy następny status
             var stateContext = new RepairOrderContext(order);
             stateContext.NextState();
             string newValidStatus = stateContext.GetStatusName();
@@ -88,7 +88,7 @@ namespace Rzonca_Babik_FixCar4Us.Pages.MechanicPanel
                 order.DifficultyDescription = Request.Form["DifficultyDescription"];
             }
 
-            // Używamy Fasady, która za jednym zamachem: loguje godziny, zużywa części i zmienia status
+            // Wzorzec facade który loguje godziny zużywa części i zmienia status
             var parts = new List<PartUsageDto>();
             if (PartIdToConsume >= 0 && QuantityToConsume > 0)
             {
@@ -110,12 +110,10 @@ namespace Rzonca_Babik_FixCar4Us.Pages.MechanicPanel
                 }
             }
 
-            // Czas pracy będzie teraz automatycznie obliczany w Fasadzie na podstawie historii logów
             double calculatedHours = 0;
 
             int serviceId = order.OrderServices.FirstOrDefault()?.ServiceId ?? 1;
 
-            // Jeden strzał z Fasady zamiast wielkiego spaghetti
             _facade.LogWorkAndCompleteStage(order.Id, serviceId, calculatedHours, parts, newValidStatus);
 
             return RedirectToPage();
@@ -129,13 +127,12 @@ namespace Rzonca_Babik_FixCar4Us.Pages.MechanicPanel
             if (order == null || order.Status == "Zakończone" || order.Status == "Opłacone")
                 return RedirectToPage();
 
-            // Używamy wzorca State, by cofnąć status
+            // Wzorzec state do cofania statusu
             var stateContext = new RepairOrderContext(order);
             stateContext.PreviousState();
             string newValidStatus = stateContext.GetStatusName();
 
-            // Fasada aktualizuje status w logach.
-            // Przy cofaniu nie dodajemy części ani czasu
+            // Facade aktualizuje status w logach
             int serviceId = order.OrderServices.FirstOrDefault()?.ServiceId ?? 1;
             _facade.LogWorkAndCompleteStage(order.Id, serviceId, 0, new List<PartUsageDto>(), newValidStatus);
 
@@ -162,7 +159,7 @@ namespace Rzonca_Babik_FixCar4Us.Pages.MechanicPanel
                 Status = "Zaplanowane"
             };
 
-            // Sprawdzamy, czy można zaplanować wizytę (Mediator)
+            // Mediator sprawdza czy można zaplanować wizytę
             if (!_mediator.TryScheduleAppointment(appointment, out string errorMessage))
             {
                 ModelState.AddModelError(string.Empty, errorMessage);
@@ -172,7 +169,7 @@ namespace Rzonca_Babik_FixCar4Us.Pages.MechanicPanel
 
             _context.Appointments.Add(appointment);
 
-            // Po zaplanowaniu przenosimy do statusu "Przyjęte" i przypisujemy pracownika
+            // Po zaplanowaniu zmiana statusu na "Przyjęte" i przypisanie pracownika
             order.Status = "Przyjęte";
             order.EmployeeId = SelectedEmployeeId;
             await _context.SaveChangesAsync();
@@ -187,7 +184,7 @@ namespace Rzonca_Babik_FixCar4Us.Pages.MechanicPanel
                 .Include(r => r.Employee)
                 .Include(r => r.OrderServices)
                 .ThenInclude(os => os.Service)
-                .Where(r => r.Status != "Gotowe do odbioru" && r.Status != "Zakończone" && r.Status != "Opłacone") // Pokazuj tylko niezakończone i nieopłacone
+                .Where(r => r.Status != "Gotowe do odbioru" && r.Status != "Zakończone" && r.Status != "Opłacone")
                 .ToListAsync();
 
             var appointments = await _context.Appointments
@@ -226,7 +223,8 @@ namespace Rzonca_Babik_FixCar4Us.Pages.MechanicPanel
             ViewData["WorkstationsList"] = new SelectList(workstations, "Id", "Name");
 
             var employees = await _context.Employees.ToListAsync();
-            ViewData["EmployeesList"] = new SelectList(employees.Select(e => new {
+            ViewData["EmployeesList"] = new SelectList(employees.Select(e => new
+            {
                 Id = e.Id,
                 FullName = e.FirstName + " " + e.LastName + " (" + e.Speciality + ")"
             }), "Id", "FullName");

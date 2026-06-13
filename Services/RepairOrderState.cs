@@ -3,29 +3,23 @@ using Rzonca_Babik_FixCar4Us.Models;
 
 namespace Rzonca_Babik_FixCar4Us.Services
 {
-    // =========================================================================
-    // INTERFEJS STANU
-    // =========================================================================
+    // Interfejs state
     public interface IRepairState
     {
-        // Metoda przechodząca do kolejnego, zdefiniowanego etapu
+        // Metoda przechodząca do kolejnego zdefiniowanego etapu
         void NextState(RepairOrderContext context);
 
-        // Metoda powrotu do poprzedniego statusu (Rollback)
+        // Metoda powrotu do poprzedniego statusu
         void PreviousState(RepairOrderContext context);
 
         // Metoda ułatwiająca ewentualne ominięcie czekania na części
         void SkipToRepair(RepairOrderContext context);
 
-        // Zwraca nazwę stanu czytelną dla bazy danych i człowieka
+        // Zwraca nazwę stanu
         string GetStatusName();
     }
 
-    // =========================================================================
-    // KONTEKST
-    // Klasa "opakowująca" nasze Zlecenie Naprawy. Przechowuje aktualny stan 
-    // i deleguje do niego zachowania.
-    // =========================================================================
+    // RepairOrderContext
     public class RepairOrderContext
     {
         private IRepairState _currentState;
@@ -34,18 +28,15 @@ namespace Rzonca_Babik_FixCar4Us.Services
         public RepairOrderContext(RepairOrder order)
         {
             Order = order;
-            // Inicjalizujemy odpowiedni obiekt stanu na podstawie tego, co jest w bazie
             _currentState = StateFactory.GetStateFromString(order.Status);
         }
 
-        // Zmiana stanu zaktualizuje też obiekt biznesowy w bazie
         public void SetState(IRepairState state)
         {
             _currentState = state;
             Order.Status = _currentState.GetStatusName();
         }
 
-        // Zlecenie "samo" decyduje wewnątrz stanu, do jakiego etapu ma przejść
         public void NextState()
         {
             _currentState.NextState(this);
@@ -67,10 +58,7 @@ namespace Rzonca_Babik_FixCar4Us.Services
         }
     }
 
-    // =========================================================================
-    // KONKRETNE STANY
-    // =========================================================================
-
+    // Lista stanow
     public class AcceptedState : IRepairState
     {
         public void NextState(RepairOrderContext context)
@@ -78,7 +66,7 @@ namespace Rzonca_Babik_FixCar4Us.Services
             context.SetState(new DiagnosticsState());
         }
 
-        public void PreviousState(RepairOrderContext context) { } // Startowy, nie ma powrotu
+        public void PreviousState(RepairOrderContext context) { }
 
         public void SkipToRepair(RepairOrderContext context) { }
 
@@ -134,7 +122,7 @@ namespace Rzonca_Babik_FixCar4Us.Services
             context.SetState(new OrderingPartsState());
         }
 
-        public void SkipToRepair(RepairOrderContext context) { } // ignoruj
+        public void SkipToRepair(RepairOrderContext context) { }
 
         public string GetStatusName() => "W naprawie";
     }
@@ -161,7 +149,7 @@ namespace Rzonca_Babik_FixCar4Us.Services
     {
         public void NextState(RepairOrderContext context) { }
 
-        public void PreviousState(RepairOrderContext context) { } // Zakończone, blokada powrotu
+        public void PreviousState(RepairOrderContext context) { }
 
         public void SkipToRepair(RepairOrderContext context) { }
 
@@ -176,9 +164,6 @@ namespace Rzonca_Babik_FixCar4Us.Services
         public string GetStatusName() => "Opłacone";
     }
 
-    // =========================================================================
-    // PROSTA FABRYKA STANÓW (Ułatwienie konwersji ze stringa z DB)
-    // =========================================================================
     public static class StateFactory
     {
         public static IRepairState GetStateFromString(string? status)
@@ -192,7 +177,7 @@ namespace Rzonca_Babik_FixCar4Us.Services
                 "Wycena dodatkowa" => new DifficultyPricingState(),
                 "Zakończone" => new CompletedState(),
                 "Opłacone" => new PaidState(),
-                _ => new AcceptedState() // Domyślny startowy
+                _ => new AcceptedState()
             };
         }
     }

@@ -1,8 +1,8 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Rzonca_Babik_FixCar4Us.Data;
 using Rzonca_Babik_FixCar4Us.Models;
-using System.Threading.Tasks;
 
 namespace Rzonca_Babik_FixCar4Us.Pages.Vehicles;
 
@@ -30,11 +30,10 @@ public class CreateModel : PageModel
             return Page();
         }
 
-        // Zapisujemy nowy pojazd do bazy
+        // Zapisywanie nowego pojazdu do bazy
         _context.Vehicles.Add(Vehicle);
         await _context.SaveChangesAsync();
 
-        // Przekierowanie z powrotem do głównej listy pojazdów
         return RedirectToPage("/Vehicles");
     }
 }

@@ -1,9 +1,9 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Rzonca_Babik_FixCar4Us.Data;
 using Rzonca_Babik_FixCar4Us.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Rzonca_Babik_FixCar4Us.Pages;
 
@@ -20,7 +20,7 @@ public class VehiclesModel : PageModel
 
     public async Task OnGetAsync()
     {
-        // Pobieramy listę pojazdów z bazy danych
+        // Pobranie listy pojazdów z bazy danych
         Vehicles = await _context.Vehicles.ToListAsync();
     }
 }

@@ -6,29 +6,21 @@ using Rzonca_Babik_FixCar4Us.Models;
 
 namespace Rzonca_Babik_FixCar4Us.Services
 {
-    // =========================================================================
-    // WZORZEC MEMENTO (Pamiątka)
-    // Przechowuje "migawkę" stanu zamówienia (status, stan magazynowy)
-    // =========================================================================
+    //Wzorzec memento
     public class RepairOrderMemento
     {
         public string Status { get; private set; }
 
-        // Słownik przechowujący IdCzęści -> ZapisanyStanMagazynowy
         public Dictionary<int, int> PartsStockSnapshot { get; private set; }
 
         public RepairOrderMemento(string status, Dictionary<int, int> partsSnapshot)
         {
             Status = status;
-            // Tworzymy nową kopię słownika, aby nikt z zewnątrz nie mógł go zmienić
             PartsStockSnapshot = new Dictionary<int, int>(partsSnapshot);
         }
     }
 
-    // =========================================================================
-    // WZORZEC COMMAND (Polecenie)
-    // Definiuje abstrakcję dla operacji na zleceniu (np. przejście etapu)
-    // =========================================================================
+    // Wzorzec command
     public interface IRepairCommand
     {
         void Execute();
@@ -36,7 +28,7 @@ namespace Rzonca_Babik_FixCar4Us.Services
         string GetCommandName();
     }
 
-    // Konkretne Polecenie - zmiana etapu naprawy (i pobranie części z magazynu)
+    // Zmiana etapu naprawy i pobranie części z magazynu
     public class ChangeRepairStageCommand : IRepairCommand
     {
         private readonly AppDbContext _context;
@@ -44,7 +36,7 @@ namespace Rzonca_Babik_FixCar4Us.Services
         private readonly string _newStatus;
         private readonly List<OrderPart> _partsUsedInStage;
 
-        // Obiekt wzorca Memento przechowujący stan zlecenia przed wykonaniem polecenia
+        // Obiekt wzorca memento przechowujacy stan zlecenia przed wykonaniem polecenia
         private RepairOrderMemento? _memento;
 
         public ChangeRepairStageCommand(AppDbContext context, RepairOrder order, string newStatus, List<OrderPart> partsUsedInStage)
@@ -57,7 +49,7 @@ namespace Rzonca_Babik_FixCar4Us.Services
 
         public void Execute()
         {
-            // 1. Zapisanie obecnego stanu (Tworzenie Pamiątki / Memento) przed zmianami
+            // Zapisanie obecnego stanu
             var currentPartsSnapshot = new Dictionary<int, int>();
             foreach (var partUse in _partsUsedInStage)
             {
@@ -73,13 +65,12 @@ namespace Rzonca_Babik_FixCar4Us.Services
                     }
                 }
             }
-            // Zapisujemy Memento z tym, co było PRZED zmianą
+            // Zapisanie memento z tym co było przed zmiana
             _memento = new RepairOrderMemento(_order.Status ?? "Przyjęto na serwis", currentPartsSnapshot);
 
-            // 2. Właściwa akcja Polecenia
             _order.Status = _newStatus;
 
-            // 3. Dodanie wpisu do logów naprawy (ślad rewizyjny)
+            // Dodanie wpisu do logów naprawy
             var log = new RepairHistoryLog
             {
                 RepairOrderId = _order.Id,
@@ -89,18 +80,18 @@ namespace Rzonca_Babik_FixCar4Us.Services
             };
             _context.RepairHistoryLogs.Add(log);
 
-            // 4. Zapis w bazie (w prawdziwej aplikacji użylibyśmy transakcji)
+            // Zapis w bazie
             _context.SaveChanges();
         }
 
         public void Undo()
         {
-            if (_memento == null) return; // brak stanu do przywrócenia
+            if (_memento == null) return;
 
-            // 1. Przywracanie dawnego statusu naprawy (Restore from Memento)
+            // Przywracanie dawnego statusu naprawy z memento
             _order.Status = _memento.Status;
 
-            // 2. Przywracanie wcześniejszego stanu magazynowego z Pamiątki
+            // Przywracanie wcześniejszego stanu magazynowego z memento
             foreach (var kvp in _memento.PartsStockSnapshot)
             {
                 int partId = kvp.Key;
@@ -109,12 +100,12 @@ namespace Rzonca_Babik_FixCar4Us.Services
                 var part = _context.Parts.Find(partId);
                 if (part != null)
                 {
-                    // Wycofujemy pobranie części (przywracamy poprzednią liczbę sztuk na magazyn)
+                    // Wycofanie pobrania części
                     part.StockQuantity = oldQuantity;
                 }
             }
 
-            // 3. Dodanie wpisu informującego o WYCOFANIU etapu
+            // Dodanie wpisu o wycofaniu etapu
             var log = new RepairHistoryLog
             {
                 RepairOrderId = _order.Id,
@@ -133,18 +124,14 @@ namespace Rzonca_Babik_FixCar4Us.Services
         }
     }
 
-    // =========================================================================
-    // Zarządca (Invoker) - obsługuje uruchamianie i cofanie poleceń
-    // =========================================================================
     public class RepairRollbackEngine
     {
-        // Stos poleceń, by móc je cofać w odwrotnej kolejności
         private readonly Stack<IRepairCommand> _commandHistory = new Stack<IRepairCommand>();
 
         public void ExecuteCommand(IRepairCommand command)
         {
             command.Execute();
-            _commandHistory.Push(command); // dodajemy do historii
+            _commandHistory.Push(command);
         }
 
         public bool UndoLastCommand()
@@ -155,7 +142,7 @@ namespace Rzonca_Babik_FixCar4Us.Services
                 lastCommand.Undo();
                 return true;
             }
-            return false; // brak historii do wycofania
+            return false;
         }
 
         public int GetHistoryCount()

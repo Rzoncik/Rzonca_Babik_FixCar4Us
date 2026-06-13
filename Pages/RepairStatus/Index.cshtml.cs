@@ -47,7 +47,7 @@ namespace Rzonca_Babik_FixCar4Us.Pages.RepairStatus
                 var searchNumberString = SearchString.Replace("#", "").Trim();
                 bool isNumeric = int.TryParse(searchNumberString, out int searchId);
 
-                query = query.Where(r => 
+                query = query.Where(r =>
                     (isNumeric && r.Id == searchId) ||
                     (r.Status != null && r.Status.ToLower().Contains(lowerSearch)) ||
                     (r.Vehicle != null && ((r.Vehicle.Model != null && r.Vehicle.Model.ToLower().Contains(lowerSearch)) || (r.Vehicle.LicensePlate != null && r.Vehicle.LicensePlate.ToLower().Contains(lowerSearch)))) ||

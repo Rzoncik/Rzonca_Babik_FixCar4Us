@@ -6,7 +6,6 @@ using Rzonca_Babik_FixCar4Us.Models;
 
 namespace Rzonca_Babik_FixCar4Us.Services
 {
-    // Prosty model DTO (Data Transfer Object) do komunikacji z widokiem mechanika
     public class PartUsageDto
     {
         public int PartId { get; set; }
@@ -14,52 +13,40 @@ namespace Rzonca_Babik_FixCar4Us.Services
         public double CurrentPrice { get; set; }
     }
 
-    // =========================================================================
-    // INTERFEJS FASADY (Facade)
-    // =========================================================================
+    // Interfejs facade
     public interface IMechanicPanelFacade
     {
         bool LogWorkAndCompleteStage(int repairOrderId, int serviceId, double loggedHours, List<PartUsageDto> partsUsed, string nextStatus);
     }
 
-    // =========================================================================
-    // FASADA (Facade)
-    // Ukrywa złożoność operacji wykonywanych na bazie danych przed kontrolerem/widokiem.
-    // Jednym wywołaniem aktualizuje status, loguje czas i pobiera z magazynu.
-    // =========================================================================
     public class MechanicPanelFacade : IMechanicPanelFacade
     {
         private readonly AppDbContext _context;
         private readonly IRepairOrderNotifier _notifier;
         private readonly RepairPricingEngine _pricingEngine;
 
-        // Wstrzykujemy kontekst bazy danych oraz system powiadomień
+        // Ładowanie kontekstu bazy danych
         public MechanicPanelFacade(AppDbContext context, IRepairOrderNotifier notifier, RepairPricingEngine pricingEngine)
         {
             _context = context;
             _notifier = notifier;
             _pricingEngine = pricingEngine;
 
-            // Rejestracja obserwatorów (w prawdziwej aplikacji można to robić w DI lub konfiguracji)
+            // Rejestracja obserwatorów
             _notifier.Attach(new EmailNotificationObserver());
             _notifier.Attach(new SmsNotificationObserver());
         }
 
-        /// <summary>
-        /// Wykonuje wszystkie akcje przypisane jednemu "kliknięciu" mechanika
-        /// </summary>
         public bool LogWorkAndCompleteStage(int repairOrderId, int serviceId, double loggedHours, List<PartUsageDto> partsUsed, string nextStatus)
         {
             var order = _context.RepairOrders.Find(repairOrderId);
             if (order == null) return false;
 
-            // KROK 1: Logowanie czasu pracy i usługi
+            // Logowanie czasu pracy i usługi
             var existingService = _context.OrderServices.FirstOrDefault(os => os.RepairOrderId == repairOrderId && os.ServiceId == serviceId);
 
-            // --- AUTOMATYCZNE OBLICZANIE CZASU NAPRAWY ---
+            // Automatyczne liczenie czasu naprawy
             double autoCalculatedHours = loggedHours;
-            // Sprawdzamy nextStatus, ponieważ order.Status został już zmutowany w kontrolerze przez RepairOrderContext.NextState()
-            // Etap "W naprawie" zawsze przechodzi do "Wycena dodatkowa"
             if (nextStatus == "Wycena dodatkowa")
             {
                 var startLog = _context.RepairHistoryLogs
@@ -71,22 +58,20 @@ namespace Rzonca_Babik_FixCar4Us.Services
                 {
                     autoCalculatedHours = (DateTime.Now - startTime).TotalHours;
                     autoCalculatedHours = Math.Round(autoCalculatedHours, 2);
-                    if (autoCalculatedHours < 0.5) autoCalculatedHours = 0.5; // minimum pół godziny
+                    if (autoCalculatedHours < 0.5) autoCalculatedHours = 0.5;
                 }
             }
             else if (existingService != null)
             {
-                // Dla innych statusów (np. przejście po Wycenie) zachowujemy istniejący czas
                 autoCalculatedHours = existingService.LoggedHours ?? 0;
             }
-            loggedHours = autoCalculatedHours; // Nadpisujemy czas na automatycznie obliczony
+            loggedHours = autoCalculatedHours;
 
             if (existingService != null)
             {
-                // Aktualizujemy istniejący rekord zamiast dodawać nowy (żeby nie powielać wpisów)
+                // Aktualizujemy istniejacego rekordu
                 existingService.LoggedHours = loggedHours;
 
-                // Uzupełnij CustomerId jeśli z jakiegoś powodu go brakuje
                 if (existingService.CustomerId == null && order.VehicleId.HasValue)
                 {
                     var orderVehicle = _context.Vehicles.Find(order.VehicleId.Value);
@@ -97,7 +82,7 @@ namespace Rzonca_Babik_FixCar4Us.Services
             {
                 int maxOrderServiceId = _context.OrderServices.Any() ? _context.OrderServices.Max(o => o.Id) : 0;
 
-                // Pobierz ID klienta z pojazdu
+                // Pobieranie ID klienta z pojazdu
                 int? customerId = null;
                 if (order.VehicleId.HasValue)
                 {
@@ -116,7 +101,7 @@ namespace Rzonca_Babik_FixCar4Us.Services
                 _context.OrderServices.Add(loggedService);
             }
 
-            // KROK 2: Pobieranie użytych części z magazynu oraz dodanie ich do zamówienia
+            // Pobieranie użytych części z magazynu oraz dodanie ich do zamówienia
             if (partsUsed != null && partsUsed.Any())
             {
                 int maxOrderPartId = _context.OrderParts.Any() ? _context.OrderParts.Max(o => o.Id) : 0;
@@ -125,11 +110,11 @@ namespace Rzonca_Babik_FixCar4Us.Services
                     var partInDb = _context.Parts.Find(usage.PartId);
                     if (partInDb != null)
                     {
-                        // a) Pomniejszenie stanu magazynowego 
+                        // Pomniejszenie stanu magazynowego 
                         partInDb.StockQuantity -= usage.Quantity;
-                        _context.Parts.Update(partInDb); // Wymuszamy aktualizację w EF Core
+                        _context.Parts.Update(partInDb);
 
-                        // b) Przypisanie części do zamówienia jako "zużytej"
+                        // Przypisanie części do zamówienia jako zuzytej
                         maxOrderPartId++;
                         var orderPart = new OrderPart
                         {
@@ -144,26 +129,25 @@ namespace Rzonca_Babik_FixCar4Us.Services
                 }
             }
 
-            // KROK 3: Aktualizacja statusu zlecenia 
+            // Aktualizacja statusu zlecenia 
             order.Status = nextStatus;
             if (nextStatus == "Gotowe do odbioru" || nextStatus == "Zakończone")
             {
                 order.CompletedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
 
-                // --- Generowanie Ostatecznego Kosztorysu przy użyciu Pricing Engine ---
+                // Generowanie ostatecznego kosztorysu przy użyciu Pricing Engine
                 var orderParts = _context.OrderParts.Where(p => p.RepairOrderId == repairOrderId).ToList();
                 double partsTotal = orderParts.Sum(p => (p.Quantity ?? 0) * (p.PriceAtTheTime ?? 0.0));
 
                 var service = _context.Services.Find(serviceId);
                 double baseHourlyRate = service?.BaseHourlyRate ?? 150.0;
 
-                // Używamy zaktualizowanego czasu pracy
                 double totalHours = existingService != null ? (existingService.LoggedHours ?? 0) : loggedHours;
 
                 ILaborPricingStrategy strategy = new RealTimePricingStrategy();
                 IRepairCost finalCost = new BaseRepairCost(partsTotal, strategy.CalculateLaborCost(baseHourlyRate, totalHours, 0, 0));
 
-                // Jeśli mechanik wpisał opłatę dodatkową, dekorujemy koszt
+                // Doliczenie oplaty dodatkowej do ostatecznego kosztorysu
                 if (order.AdditionalFee > 0)
                 {
                     finalCost = new CustomFeeDecorator(finalCost, order.AdditionalFee, order.DifficultyDescription ?? "Opłata dodatkowa");
@@ -172,10 +156,10 @@ namespace Rzonca_Babik_FixCar4Us.Services
                 // Dodanie rabatu flotowego jeśli to zlecenie flotowe
                 if (order.IsFleet == 1)
                 {
-                    finalCost = new FleetDiscountDecorator(finalCost, 0.15); // 15% rabatu flotowego dla końcowej wyceny
+                    finalCost = new FleetDiscountDecorator(finalCost, 0.15);
                 }
 
-                // Zapisz całkowity kosztorys
+                // Zapisz całkowity kosztorys do baazy
                 if (existingService != null)
                 {
                     existingService.FinalPrice = finalCost.GetTotalCost();
@@ -187,7 +171,7 @@ namespace Rzonca_Babik_FixCar4Us.Services
                 }
             }
 
-            // KROK 4: Dodanie wpisu do historii zlecenia, że mechanik zakończył dany etap
+            // Dodanie wpisu do histori zlecenia że mechanik zakończył dany etap
             int maxHistoryLogId = _context.RepairHistoryLogs.Any() ? _context.RepairHistoryLogs.Max(h => h.Id) : 0;
             var historyLog = new RepairHistoryLog
             {
@@ -199,11 +183,11 @@ namespace Rzonca_Babik_FixCar4Us.Services
             };
             _context.RepairHistoryLogs.Add(historyLog);
 
-            // Zapisujemy wszystkie wyżej wymienione zmiany RAZ (wzorzec UnitOfWork realizowany przez SaveChanges EF)
+            // Zapisanie wszystkich zmian
             _context.SaveChanges();
 
-            // KROK 5: Użycie wzorca Observer do powiadomienia klienta
-            // Najpierw pobieramy klienta powiązanego z tym autem
+            // Użycie wzorca Observer do powiadomienia klienta
+            // Pobieranie klienta powiązanego z danym autem
             var vehicle = _context.Vehicles.Find(order.VehicleId);
             if (vehicle != null && vehicle.CustomerId.HasValue)
             {

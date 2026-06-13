@@ -4,47 +4,36 @@ using Rzonca_Babik_FixCar4Us.Models;
 
 namespace Rzonca_Babik_FixCar4Us.Services
 {
-    // =========================================================================
-    // OBSERVER (Interfejs subskrybenta/obserwatora)
-    // Definiuje metodę, która zostanie wywołana przy każdym zdarzeniu
-    // =========================================================================
+    // Interfejs observer
     public interface IRepairStatusObserver
     {
         void Update(Customer customer, RepairOrder order, string message);
     }
 
-    // =========================================================================
-    // KONKRETNI OBSERWATORZY (Sposoby komunikacji)
-    // =========================================================================
-
+    // Powiadomienie email
     public class EmailNotificationObserver : IRepairStatusObserver
     {
         public void Update(Customer customer, RepairOrder order, string message)
         {
             if (string.IsNullOrEmpty(customer.Email)) return;
-            
-            // W prawdziwym projekcie tu znajdowałaby się np. wysyłka SmtpClient lub SendGrid
+
             Console.WriteLine($"\n[SYSTEM EMAIL] Wysłano e-mail do {customer.Email}");
             Console.WriteLine($"Temat: Twój pojazd (Zlecenie #{order.Id})");
             Console.WriteLine($"Treść: {message}\n");
         }
     }
 
+    // Powiadomienie sms
     public class SmsNotificationObserver : IRepairStatusObserver
     {
         public void Update(Customer customer, RepairOrder order, string message)
         {
             if (customer.PhoneNumber == null || customer.PhoneNumber == 0) return;
-            
-            // W prawdziwym projekcie integracja z bramką SMS
             Console.WriteLine($"\n[SYSTEM SMS] Wysłano SMS na numer {customer.PhoneNumber}");
             Console.WriteLine($"Treść: FixCar4Us: {message}\n");
         }
     }
 
-    // =========================================================================
-    // SUBJECT / PUBLISHER (Wydawca/Nadawca powiadomień)
-    // =========================================================================
     public interface IRepairOrderNotifier
     {
         void Attach(IRepairStatusObserver observer);
@@ -54,7 +43,6 @@ namespace Rzonca_Babik_FixCar4Us.Services
 
     public class RepairOrderNotifier : IRepairOrderNotifier
     {
-        // Lista przypisanych obserwatorów (subskrybentów na zdarzenia)
         private readonly List<IRepairStatusObserver> _observers = new List<IRepairStatusObserver>();
 
         public void Attach(IRepairStatusObserver observer)

@@ -10,23 +10,23 @@ builder.Services.AddRazorPages();
 builder.Services.AddDbContext<Rzonca_Babik_FixCar4Us.Data.AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Rejestracja Mediatora (Orkiestratora Warsztatu)
+// Rejestracja mediatora
 builder.Services.AddScoped<IWorkshopMediator, WorkshopMediator>();
 
-// Rejestracja Silnika Wyceny (Pricing Engine)
+// Rejestracja pricing engine
 builder.Services.AddScoped<RepairPricingEngine>();
 
-// Rejestracja Systemu Zarządzania Etapami i Cofania (Rollback Engine)
+// Rejestracja rollback engine
 builder.Services.AddScoped<RepairRollbackEngine>();
 
-// Rejestracja Wzorca Builder do budowy zleceń
+// Rejestracja wzorca builder
 builder.Services.AddTransient<IRepairOrderBuilder, RepairOrderBuilder>();
 builder.Services.AddTransient<RepairOrderDirector>();
 
-// Rejestracja Wzorca Facade dla Panelu Mechanika
+// Rejestracja wzorca facade
 builder.Services.AddScoped<IMechanicPanelFacade, MechanicPanelFacade>();
 
-// Rejestracja Wzorca Observer (Powiadomienia)
+// Rejestracja wzorca observer
 builder.Services.AddScoped<IRepairOrderNotifier, RepairOrderNotifier>();
 
 var app = builder.Build();
@@ -43,7 +43,6 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
-// Własne middleware do zabezpieczenia paneli pracowniczych
 app.Use(async (context, next) =>
 {
     var path = context.Request.Path.Value ?? "";

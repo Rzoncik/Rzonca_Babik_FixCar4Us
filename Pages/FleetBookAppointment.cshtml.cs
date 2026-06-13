@@ -1,13 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Rzonca_Babik_FixCar4Us.Data;
 using Rzonca_Babik_FixCar4Us.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Rzonca_Babik_FixCar4Us.Pages
 {
@@ -85,7 +85,7 @@ namespace Rzonca_Babik_FixCar4Us.Pages
             if (await _context.OrderServices.AnyAsync()) maxOrderServiceId = await _context.OrderServices.MaxAsync(o => o.Id);
 
             var allServices = await _context.Services.ToListAsync();
-            
+
             var rnd = new Random();
             int carIndex = 0;
 
@@ -104,12 +104,10 @@ namespace Rzonca_Babik_FixCar4Us.Pages
                         issueText += " | Opis usterki/Uwagi: " + ReportedIssues;
                     }
 
-                    // ========================================================
-                    // Logika wyceny flotowej (Pricing Engine)
-                    // ========================================================
+                    // Wycena flotowa
                     var activeDecorators = new List<string>();
-                    
-                    // 1. Zniżka flotowa progresywna: każde kolejne auto obniża cenę o 2%
+
+                    // Zniżka flotowa każde kolejne auto obniża cenę o 2%
                     double discountPercent = carIndex * 0.02;
                     if (discountPercent > 0)
                     {
@@ -119,12 +117,12 @@ namespace Rzonca_Babik_FixCar4Us.Pages
                     // Symulacja ceny bazowej
                     var strategy = new Services.FlatRatePricingStrategy();
                     double baseRate = selectedService?.BaseHourlyRate ?? 150.0;
-                    
-                    // Kalkulacja za pomocą Silnika Wycen
+
+                    // Kalkulacja za pomocą silnika wycen
                     var estimatedCost = _pricingEngine.CreatePricing(0, baseRate, 0, 0, baseRate * 2, strategy, activeDecorators);
 
                     issueText += " (Zgłoszenie flotowe). Wycena szacunkowa:\n" + estimatedCost.GetDescription();
-                    
+
                     SuccessMessages.Add($"{vehicleName}: Wyceniono na <strong>{estimatedCost.GetTotalCost():C}</strong>. " +
                                         $"{(discountPercent > 0 ? $"<span class='badge bg-success'>Rabat {discountPercent * 100}%</span>" : "")}");
 
@@ -153,7 +151,7 @@ namespace Rzonca_Babik_FixCar4Us.Pages
                             FinalPrice = estimatedCost.GetTotalCost()
                         });
                     }
-                    
+
                     carIndex++;
                 }
             }

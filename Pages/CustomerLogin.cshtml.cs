@@ -30,7 +30,7 @@ namespace Rzonca_Babik_FixCar4Us.Pages
                 return Page();
             }
 
-            // Szukamy klienta po adresie email
+            // Szukanie klienta po adresie email
             var customer = _context.Customers.FirstOrDefault(c => c.Email == Input.Email);
 
             if (customer == null)
@@ -39,7 +39,7 @@ namespace Rzonca_Babik_FixCar4Us.Pages
                 return Page();
             }
 
-            // Hashowanie podanego hasła do sprawdzenia (identycznie jak przy rejestracji)
+            // Hashowanie SHA256 podanego hasła do sprawdzenia
             using var sha256 = SHA256.Create();
             var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(Input.Password));
             var hash = BitConverter.ToString(hashedBytes).Replace("-", "").ToLowerInvariant();
@@ -51,11 +51,10 @@ namespace Rzonca_Babik_FixCar4Us.Pages
                 return Page();
             }
 
-            // Logowanie poprawne - z reguły tutaj zapisuje się sesję lub cookie.
-            // Najpierw usuwamy stare ciasteczko, na wypadek gdyby ktoś był już zalogowany
+            // Usuwanie starej sesji i ciasteczek i zapisywanie nowych
             HttpContext.Response.Cookies.Delete("LoggedCustomerId");
 
-            // Zapisujemy CustomerId w prostym ciasteczku (jako 2 rok studiów)
+            // Zapisanie CustomerId w ciasteczku na 7 dni
             var cookieOptions = new CookieOptions { Expires = DateTime.Now.AddDays(7) };
             HttpContext.Response.Cookies.Append("LoggedCustomerId", customer.Id.ToString(), cookieOptions);
 

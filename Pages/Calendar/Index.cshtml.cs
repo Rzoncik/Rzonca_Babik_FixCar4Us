@@ -25,13 +25,11 @@ namespace Rzonca_Babik_FixCar4Us.Pages.Calendar
         // Lista wizyt do wyświetlenia
         public IList<Appointment> Appointments { get; set; } = default!;
 
-        // Słownik używany do szybkiego wyszukiwania nazwy pojazdu w widoku (ponieważ nie ma Navigation Property dla Vehicle w Appointment)
         public Dictionary<int, string> VehiclesDict { get; set; } = new Dictionary<int, string>();
 
         [BindProperty]
         public Appointment NewAppointment { get; set; } = new Appointment();
 
-        // Listy dla DropDowns (Select) w HTML
         public SelectList WorkstationsList { get; set; } = default!;
         public SelectList VehiclesList { get; set; } = default!;
         public SelectList ServicesList { get; set; } = default!;
@@ -130,30 +128,27 @@ namespace Rzonca_Babik_FixCar4Us.Pages.Calendar
 
         public async Task<IActionResult> OnPostAsync()
         {
-            // Walidacja czy wybrano podstawowe informacje
+            // Sprawdzanie czy wybrano podstawowe informacje
             if (NewAppointment.VehicleId != null && NewAppointment.WorkstationId != null)
             {
-                // WZORZEC MEDIATOR: Sprawdzamy, czy można zaplanować wizytę bez konfliktów na warsztacie
+                // Sprawdzanie czy można zaplanować wizytę bez konfliktów na warsztacie dzięki mediatorowi
                 if (!_mediator.TryScheduleAppointment(NewAppointment, out string errorMessage))
                 {
-                    // Jeśli Mediator zablokował rezerwację, zwracamy błąd do interfejsu (np. stanowisko jest zajęte)
+                    // Mediator zwraca błąd gdy nie można zaplanować wizyty
                     ModelState.AddModelError(string.Empty, errorMessage);
                     await LoadDataAsync();
                     return Page();
                 }
 
-                // Rozwiązanie dla ValueGeneratedNever() skonfigurowanego w DbContext:
                 int maxId = 0;
                 if (await _context.Appointments.AnyAsync())
                 {
                     maxId = await _context.Appointments.MaxAsync(a => a.Id);
                 }
-                NewAppointment.Id = maxId + 1; // Ręczna inkrementacja ID
+                NewAppointment.Id = maxId + 1;
 
                 _context.Appointments.Add(NewAppointment);
 
-                // --- DODANE W CELU INTEGRACJI Z PANELEM MECHANIKA ---
-                // Tworzymy też wpis do RepairOrders (oraz ewentualnie dodajemy usługi i części)
                 int maxOrderId = 0;
                 if (await _context.RepairOrders.AnyAsync())
                 {
@@ -172,7 +167,7 @@ namespace Rzonca_Babik_FixCar4Us.Pages.Calendar
                 {
                     Id = maxOrderId + 1,
                     VehicleId = NewAppointment.VehicleId,
-                    Status = "Przyjęte", // Status początkowy
+                    Status = "Przyjęte",
                     CreatedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm"),
                     ReportedIssues = reportedIssuesText
                 };
@@ -211,14 +206,12 @@ namespace Rzonca_Babik_FixCar4Us.Pages.Calendar
                         });
                     }
                 }
-                // ----------------------------------------------------
 
                 await _context.SaveChangesAsync();
 
                 return RedirectToPage("./Index");
             }
 
-            // W razie braku walidacji ładujemy listy na nowo
             await LoadDataAsync();
             return Page();
         }
@@ -251,12 +244,12 @@ namespace Rzonca_Babik_FixCar4Us.Pages.Calendar
             if (_context.Appointments != null)
             {
                 Appointments = await _context.Appointments
-                    .Include(a => a.Workstation) // Wciągamy dane powiązanego stanowiska
+                    .Include(a => a.Workstation)
                     .OrderBy(a => a.PlannedStart)
                     .ToListAsync();
             }
 
-            // Pobieranie aut, by wypełnić listę wyboru i słownik do widoku
+            // Pobieranie aut z bazy
             if (_context.Vehicles != null)
             {
                 var vehicles = await _context.Vehicles.ToListAsync();
