@@ -34,7 +34,6 @@ namespace Rzonca_Babik_FixCar4Us.Services
 
             // Rejestracja obserwatorów
             _notifier.Attach(new EmailNotificationObserver());
-            _notifier.Attach(new SmsNotificationObserver());
         }
 
         public bool LogWorkAndCompleteStage(int repairOrderId, int serviceId, double loggedHours, List<PartUsageDto> partsUsed, string nextStatus)

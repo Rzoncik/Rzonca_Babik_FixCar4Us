@@ -17,20 +17,36 @@ namespace Rzonca_Babik_FixCar4Us.Services
         {
             if (string.IsNullOrEmpty(customer.Email)) return;
 
-            Console.WriteLine($"\n[SYSTEM EMAIL] Wysłano e-mail do {customer.Email}");
-            Console.WriteLine($"Temat: Twój pojazd (Zlecenie #{order.Id})");
-            Console.WriteLine($"Treść: {message}\n");
-        }
-    }
+            Console.WriteLine($"\n[SYSTEM EMAIL] Przygotowuję wysyłkę e-mail do {customer.Email}...");
 
-    // Powiadomienie sms
-    public class SmsNotificationObserver : IRepairStatusObserver
-    {
-        public void Update(Customer customer, RepairOrder order, string message)
-        {
-            if (customer.PhoneNumber == null || customer.PhoneNumber == 0) return;
-            Console.WriteLine($"\n[SYSTEM SMS] Wysłano SMS na numer {customer.PhoneNumber}");
-            Console.WriteLine($"Treść: FixCar4Us: {message}\n");
+            try
+            {
+                // Konfiguracja Mailtrap.io
+                using (System.Net.Mail.SmtpClient client = new System.Net.Mail.SmtpClient("sandbox.smtp.mailtrap.io", 587))
+                {
+                    client.EnableSsl = true;
+                    client.UseDefaultCredentials = false;
+                    client.Credentials = new System.Net.NetworkCredential("25c01632302180", "dd1f3c0b681f6c");
+
+                    System.Net.Mail.MailMessage mailMessage = new System.Net.Mail.MailMessage();
+                    mailMessage.From = new System.Net.Mail.MailAddress("warsztat@fixcar4us.pl", "Warsztat FixCar4Us");
+                    mailMessage.To.Add(customer.Email);
+                    mailMessage.Subject = $"FixCar4Us - Zmiana statusu zlecenia #{order.Id}";
+
+                    mailMessage.Body = $"Witaj {customer.FirstName},\n\n" +
+                                       $"Twój pojazd ({order.Vehicle?.LicensePlate ?? "nieznany"}) " +
+                                       $"zmienił status na: {order.Status}.\n\n" +
+                                       $"Wiadomość z systemu:\n{message}\n\n" +
+                                       $"Pozdrawiamy,\nZespół FixCar4Us";
+
+                    client.Send(mailMessage);
+                    Console.WriteLine($"[SYSTEM EMAIL] Pomyślnie wysłano e-mail przez Mailtrap do {customer.Email}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[BŁĄD EMAIL] Nie udało się wysłać wiadomości: {ex.Message}");
+            }
         }
     }
 
