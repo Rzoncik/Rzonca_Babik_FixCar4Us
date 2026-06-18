@@ -4,7 +4,6 @@ using Rzonca_Babik_FixCar4Us.Models;
 
 namespace Rzonca_Babik_FixCar4Us.Services
 {
-    // Kompleksowy obiekt zlecenia naprawy
     public class ComplexRepairOrder
     {
         public RepairOrder Order { get; set; } = new RepairOrder();

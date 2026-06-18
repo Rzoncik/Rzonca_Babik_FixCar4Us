@@ -48,7 +48,6 @@ app.Use(async (context, next) =>
     var path = context.Request.Path.Value ?? "";
     bool isAdminRoute = (path.StartsWith("/Admin", StringComparison.OrdinalIgnoreCase) && !path.StartsWith("/AdminLogin", StringComparison.OrdinalIgnoreCase)) ||
                         path.StartsWith("/Calendar", StringComparison.OrdinalIgnoreCase) ||
-                        path.StartsWith("/Catalog", StringComparison.OrdinalIgnoreCase) ||
                         path.StartsWith("/Customers", StringComparison.OrdinalIgnoreCase) ||
                         path.StartsWith("/Inventory", StringComparison.OrdinalIgnoreCase) ||
                         path.StartsWith("/MechanicPanel", StringComparison.OrdinalIgnoreCase) ||

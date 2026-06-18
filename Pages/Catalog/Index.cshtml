@@ -13,6 +13,7 @@
                 <tr>
                     <th>Nazwa usługi (Kategoria)</th>
                     <th>Stawka za roboczogodzinę</th>
+                    <th>Wymagana Specjalizacja</th>
                 </tr>
             </thead>
             <tbody>
@@ -25,6 +26,7 @@
                             <td>
                                 <span>@service.BaseHourlyRate zł/h</span>
                             </td>
+                            <td>@(service.RequiredSpeciality ?? "Brak")</td>
                         </tr>
                     }
                 }

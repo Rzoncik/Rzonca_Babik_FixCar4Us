@@ -7,8 +7,10 @@
 
 @if (Model.Vehicles.Count == 0)
 {
-    <section class="alert alert-info">
-        Nie masz jeszcze żadnych dodanych pojazdów. Kliknij przycisk "Dodaj nowy pojazd", aby zacząć.
+    <section>
+        <br/>
+        <br/>
+        <span>Nie masz jeszcze żadnych dodanych pojazdów. Kliknij <a asp-page="/MyVehicles/Create">dodaj pojazd</a> aby rozpocząć.</span>
     </section>
 }
 else

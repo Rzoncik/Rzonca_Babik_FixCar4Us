@@ -141,8 +141,23 @@ namespace Rzonca_Babik_FixCar4Us.Pages.MechanicPanel
 
         public async Task<IActionResult> OnPostScheduleAsync()
         {
-            var order = await _context.RepairOrders.FindAsync(SelectedOrderId);
+            var order = await _context.RepairOrders
+                .Include(r => r.OrderServices)
+                .ThenInclude(os => os.Service)
+                .FirstOrDefaultAsync(r => r.Id == SelectedOrderId);
             if (order == null) return RedirectToPage();
+
+            var selectedEmployee = await _context.Employees.FindAsync(SelectedEmployeeId);
+            if (selectedEmployee != null && order.OrderServices.Any())
+            {
+                var service = order.OrderServices.First().Service;
+                if (!string.IsNullOrEmpty(service?.RequiredSpeciality) && selectedEmployee.Speciality != service.RequiredSpeciality)
+                {
+                    ModelState.AddModelError(string.Empty, $"Wybrany pracownik ({selectedEmployee.Speciality}) nie ma wymaganej specjalizacji: {service.RequiredSpeciality}");
+                    await LoadActiveOrders();
+                    return Page();
+                }
+            }
 
             int maxId = 0;
             if (await _context.Appointments.AnyAsync()) maxId = await _context.Appointments.MaxAsync(a => a.Id);
@@ -179,13 +194,25 @@ namespace Rzonca_Babik_FixCar4Us.Pages.MechanicPanel
 
         private async Task LoadActiveOrders()
         {
-            ActiveOrders = await _context.RepairOrders
+            var query = _context.RepairOrders
                 .Include(r => r.Vehicle)
                 .Include(r => r.Employee)
                 .Include(r => r.OrderServices)
                 .ThenInclude(os => os.Service)
-                .Where(r => r.Status != "Gotowe do odbioru" && r.Status != "Zakończone" && r.Status != "Opłacone")
-                .ToListAsync();
+                .Where(r => r.Status != "Gotowe do odbioru" && r.Status != "Zakończone" && r.Status != "Opłacone");
+
+            if (int.TryParse(HttpContext.Request.Cookies["LoggedEmployeeId"], out int employeeId))
+            {
+                var loggedEmployee = await _context.Employees.FindAsync(employeeId);
+                if (loggedEmployee != null && !string.IsNullOrEmpty(loggedEmployee.Speciality))
+                {
+                    query = query.Where(r => r.OrderServices.Any(os => 
+                        string.IsNullOrEmpty(os.Service!.RequiredSpeciality) || 
+                        os.Service.RequiredSpeciality == loggedEmployee.Speciality));
+                }
+            }
+
+            ActiveOrders = await query.ToListAsync();
 
             var appointments = await _context.Appointments
                 .Where(a => a.PlannedStart != null && a.PlannedEnd != null)
